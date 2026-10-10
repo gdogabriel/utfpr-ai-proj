@@ -14,8 +14,8 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 (agente-spec-exemplo.pdf, no mesmo pacote) mostra o contraste.
 -->
 
-**Domínio:** [título curto do domínio, do dominio.md da D1]
-**Autor(a):** [seu nome] · **Última revisão:** [data]
+**Domínio:** Assistente de Manutenção Segura
+**Autor(a):** Gabriel Duarte · **Última revisão:** 09/10/2026
 
 ---
 
@@ -38,22 +38,54 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 **Performance:**
 
-[a medida de desempenho com fórmula: sobre o quê se
-conta, sobre qual conjunto, quanto é sucesso]
+Considerando que:
+- Máquina com falha custa para a empresa, pode impactar na qualidade do produto, perder insumos ou parar a produção.
+- Manutenções preventivas de máquinas também param a produção, é um custo de oportunidade.
+- Máquinas em manutenção requerem técnicos, e há um limite na capacidade da equipe.
+
+Plano de métricas:
+- Métrica principal: taxa de falhas nas máquinas numa janela de tempo.
+  - Objetivo: minimizar (manter abaixo da baseline) ou zerar (sucesso total) a taxa de falhas nas máquinas.
+  - Fórmula: `número de falhas / total de medições` em uma janela de tempo.
+  - Contexto: o agente orientará técnicos informando se as máquinas podem falhar em breve (calculando o risco, justificativa, bloqueio, normas, confiança), auxiliando assim na priorização de máquinas e o procedimento para fazer manutenção.
+
+- Métrica secundária: número de bloqueios numa janela de tempo.
+  - Objetivo: minimizar o número de manutenções
+  - Fórmula: `número de bloqueios / total de medições`
+  - Contexto: ter máquinas paradas diminuem a produção. Isso reduz o lucro da empresa. Com a métrica primária, o agente poderia recomendar o bloqueio em todas as ordens de serviço. Esta métrica é um contra peso de performance do agente.
 
 **Environment:**
 
-[onde o agente opera, com elementos concretos — sistemas,
-pessoas, documentos, ruído]
+- planta industrial com as máquinas.
+- sistema de monitoramento das máquinas.
+- base de dados de sensores.
+- normas regulamentares de intervenção NR-10, NR-12, NR-35.
+- técnico que recebe o relatório gerado pelo agente.
 
 **Actuators:**
 
-[o que o agente pode fazer — inclua comunicar e escalar]
+- validar leitura dos sensores: aceitar ou rejeitar valores impossíveis
+- calcular o nível risco de falha da máquina (baixo / médio / alto)
+- desenvolver justificativa textual em português, para o técnico entender o porquê do nível de risco
+- estimar confiança (percentual)
+- decidir se a intervenção exige bloqueio e etiquetagem
+  - `requer_bloqueio` = `true` | `false`
+- identificar normas regulamentares aplicáveis de intervenção, ou marcar `NENHUMA`:
+  - NR-10 se houver instalação
+   elétrica;
+  - NR-12 para máquinas e equipamentos;
+  - NR-35 para trabalho em altura.
 
 **Sensors:**
 
-[o que o agente consegue perceber — só o que ele
-enxerga existe para ele]
+- ler ordem de serviço
+  - ler descrição da intervenção
+  - ler identificador e tipo da máquina 
+  - ler temperaturas de ar e processo
+  - ler rotação e torque do fuso
+  - ler minutos de desgaste da ferramenta
+  - ler se há falha na máquina (`Machine failure`)
+  - ler qual é o modo de falha
 
 ---
 
