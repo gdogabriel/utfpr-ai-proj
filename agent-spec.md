@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** Assistente de Manutenção Segura
-**Autor(a):** Gabriel Duarte · **Última revisão:** 09/10/2026
+**Autor(a):** Gabriel Duarte · **Última revisão:** 10/10/2026
 
 ---
 
@@ -34,16 +34,19 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
   Um PEAS que menciona tecnologia de solução (banco vetorial, nome de modelo)
   está descrevendo a solução — o PEAS descreve o problema.
 -->
+
 **Quando se preenche:** no Laboratório 01, hoje. Refinado na Atividade Orientada.
 
 **Performance:**
 
 Considerando que:
+
 - Máquina com falha custa para a empresa, pode impactar na qualidade do produto, perder insumos ou parar a produção.
 - Manutenções preventivas de máquinas também param a produção, é um custo de oportunidade.
 - Máquinas em manutenção requerem técnicos, e há um limite na capacidade da equipe.
 
 Plano de métricas:
+
 - Métrica principal: taxa de falhas nas máquinas numa janela de tempo.
   - Objetivo: minimizar (manter abaixo da baseline) ou zerar (sucesso total) a taxa de falhas nas máquinas.
   - Fórmula: `número de falhas / total de medições` em uma janela de tempo.
@@ -72,7 +75,7 @@ Plano de métricas:
   - `requer_bloqueio` = `true` | `false`
 - identificar normas regulamentares aplicáveis de intervenção, ou marcar `NENHUMA`:
   - NR-10 se houver instalação
-   elétrica;
+    elétrica;
   - NR-12 para máquinas e equipamentos;
   - NR-35 para trabalho em altura.
 
@@ -80,7 +83,7 @@ Plano de métricas:
 
 - ler ordem de serviço
   - ler descrição da intervenção
-  - ler identificador e tipo da máquina 
+  - ler identificador e tipo da máquina
   - ler temperaturas de ar e processo
   - ler rotação e torque do fuso
   - ler minutos de desgaste da ferramenta
@@ -105,10 +108,18 @@ Perguntas que guiam o preenchimento (uma por dimensão):
   Cada classificação vem com uma frase de justificativa — a etiqueta sozinha
   não vale nada.
 -->
+
 **Quando se preenche:** no Laboratório 02, no sábado (encontro 2).
 
-[uma linha por dimensão: a classificação e a frase de
-justificativa — começando por observabilidade e determinismo]
+| Dimensão                  | Minha classificação | Justificativa (uma frase)                                                                                                                                                                                                                                                                                           |
+| ------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Observabilidade           | parcial             | Lê apenas valores dos sensores na ordem de serviço. Não acessa um histórico de decisões recentes, isto é, não tem como aprender com decisões recentes.                                                                                                                                                              |
+| Número de agentes         | único               | Idealizei ter eventos que acionam agentes, com um controlador distribuindo tarefas, onde uma nova OS aciona um agente, sem risco de dois agentes pegarem a mesma OS.                                                                                                                                                |
+| Determinismo              | estocástico         | Estocástico, por conta de considerar usar LLM gerar justificativas, identificar normas e outras saídas.                                                                                                                                                                                                             |
+| Episódico ou sequencial   | episódico           | Pensei em ter regras criadas offline (um contexto fixo), em que cada OS recebida pelo agente é avaliada em sua totalidade, as variáveis são os valores dos sensores e metadados da máquina, e gera uma saída de risco, justificativa e outros, sem que o agente acesse uma base de dados de suas decisões recentes. |
+| Estático ou dinâmico      | dinâmico            | Uma máquina sem falhas pode falhar enquanto ordens de serviço esperam serem processadas, então é preciso um prazo para tratar para que o valor registrado dos sensores não estejam defasados da realidade.                                                                                                          |
+| Discreto ou contínuo      | contínuo            | Há sensores discretos (ex: falha, tipo de falha) mas também contínuos (temperatura, rotação, torque) e tais valores precisam ser discretizados.                                                                                                                                                                     |
+| Conhecido ou desconhecido | conhecido           | Considerando a base histórica de 10 mil linhas, e normas dadas, pode-se elaborar regras e definições que serão o contexto com regras fixas para tomada de decisões racionais, por isso é o conhecido.                                                                                                               |
 
 ---
 
@@ -122,6 +133,7 @@ Perguntas que guiam o preenchimento:
     observável elimina o reativo simples.
   - Justifique com a dimensão do ambiente que obriga a escolha.
 -->
+
 **Quando se preenche:** no sábado (encontro 2, manhã).
 
 [o tipo mais simples que resolve, justificado pela dimensão
@@ -140,6 +152,7 @@ Perguntas que guiam o preenchimento:
   - O conjunto de casos: de onde vêm, quantos são, de que período.
   - O limiar de sucesso e o valor de hoje.
 -->
+
 **Quando se preenche:** a fórmula começa no Laboratório 01; a definição
 operacional completa — primária, secundárias, conjunto e limiar — é item da
 Atividade Orientada.
@@ -161,6 +174,7 @@ Perguntas que guiam o preenchimento:
   - A troca que você aceita: quanto de qualidade por quanto de custo?
     Um exemplo numérico vale mais que a fórmula.
 -->
+
 **Quando se preenche:** na Atividade Orientada.
 
 [latência aceitável, custo aceitável, o que o agente jamais
@@ -181,6 +195,7 @@ Perguntas que guiam o preenchimento:
   - Este catálogo é, literalmente, a lista de ferramentas que você vai
     implementar em D10.
 -->
+
 **Quando se preenche:** na Atividade Orientada — o pacote `D2-07` traz o
 modelo da tabela e dois exemplos preenchidos.
 
@@ -199,6 +214,7 @@ Perguntas que guiam o preenchimento:
     de objetivo, custo de caminho. Comece pelo teste de objetivo.
   - O estado descreve a SITUAÇÃO, não a história de como se chegou nela.
 -->
+
 **Quando se preenche:** no Laboratório 03, sábado à tarde (encontro 2).
 
 [os cinco componentes do seu subproblema: estado inicial,
