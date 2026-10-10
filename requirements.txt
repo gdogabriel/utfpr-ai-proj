@@ -23,7 +23,7 @@ polars==1.44.1
 duckdb==1.5.5
 
 # HTTP e API (o cliente do Gemini é escrito à mão com httpx — sem SDK)
-httpx==0.28.1
+httpx2==2.13.1
 
 # API local (janela de exploração do E4)
 fastapi==0.141.1
