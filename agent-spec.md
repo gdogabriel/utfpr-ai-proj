@@ -37,14 +37,14 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 **Quando se preenche:** no Laboratório 01, hoje. Refinado na Atividade Orientada.
 
-**Performance:**
+### Performance:
 
-Considerações do domínio:
+#### Considerações do domínio
 
 - Parada não planejada (falha) gera alto custo de produção, perda de insumos e afeta a qualidade. 
 - Parada preventiva indevida gera custo de oportunidade e consome capacidade limitada da equipe técnica.
 
-Plano de métricas:
+#### Plano de métricas
 
 - Métrica principal: taxa de falhas nas máquinas numa janela de tempo.
   - Objetivo: minimizar (manter abaixo da baseline) ou zerar (sucesso total) a taxa de falhas nas máquinas.
@@ -56,7 +56,7 @@ Plano de métricas:
   - Fórmula: `número de bloqueios / total de medições`
   - Contexto: ter máquinas paradas diminuem a produção. Isso reduz o lucro da empresa. Com a métrica primária, o agente poderia recomendar o bloqueio em todas as ordens de serviço. Esta métrica é um contra peso de performance do agente.
 
-**Environment:**
+### Environment:
 
 - planta industrial com as máquinas.
 - sistema de monitoramento das máquinas.
@@ -64,7 +64,7 @@ Plano de métricas:
 - normas regulamentares de intervenção NR-10, NR-12, NR-35.
 - técnico que recebe o relatório gerado pelo agente.
 
-**Actuators:**
+### Actuators:
 
 - validar leitura dos sensores: aceitar ou rejeitar valores impossíveis
 - calcular o nível risco de falha da máquina (baixo / médio / alto)
@@ -78,7 +78,7 @@ Plano de métricas:
   - NR-12 para máquinas e equipamentos;
   - NR-35 para trabalho em altura.
 
-**Sensors:**
+### Sensors:
 
 - ler ordem de serviço
   - ler descrição da intervenção
