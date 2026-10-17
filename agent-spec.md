@@ -39,11 +39,10 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 **Performance:**
 
-Considerando que:
+Considerações do domínio:
 
-- Máquina com falha custa para a empresa, pode impactar na qualidade do produto, perder insumos ou parar a produção.
-- Manutenções preventivas de máquinas também param a produção, é um custo de oportunidade.
-- Máquinas em manutenção requerem técnicos, e há um limite na capacidade da equipe.
+- Parada não planejada (falha) gera alto custo de produção, perda de insumos e afeta a qualidade. 
+- Parada preventiva indevida gera custo de oportunidade e consome capacidade limitada da equipe técnica.
 
 Plano de métricas:
 
