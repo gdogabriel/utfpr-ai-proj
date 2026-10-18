@@ -225,5 +225,42 @@ Perguntas que guiam o preenchimento:
 
 **Quando se preenche:** no Laboratório 03, sábado à tarde (encontro 2).
 
-[os cinco componentes do seu subproblema: estado inicial,
-ações, transição, teste de objetivo, custo]
+### Fatia do problema que usa busca
+
+- **O que usa busca:** A determinação da ordem ideal de verificações da telemetria da máquina para chegar a um diagnóstico no menor tempo.
+
+- **O que não usa busca:** A leitura dos dados de entrada da Ordem de Serviço e a redação da justificativa em linguagem natural pelos atuadores.
+
+### Os cinco componentes da busca
+
+- **Estado Inicial:** Nenhuma verificação realizada e nenhum resultado observado.
+
+- **Ações:** Selecionar e realizar a próxima verificação pendente.
+
+- **Modelo de Transição:** Registrar a verificação como feita e, se o resultado for anômalo, adicionar o resultado positivo ao estado.
+
+- **Teste de Objetivo:** Chegar a uma conclusão com confiança suficiente (concluir todas as verificações essenciais do caso).
+
+- **Custo de Caminho:** O tempo consumido pela verificação (a soma dos tempos das verificações executadas na sequência).
+
+---
+
+**Comando:**
+`python verificar-formulacao.py diagnostico.py` ou `python verificar-formulacao.py diagnostico.py:AMS`
+
+**Resultado:**
+
+```
+verificar-formulacao — teste de sanidade da formulação de busca
+
+— diagnostico.py
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+Seis verificações verdes — a formulação pode ir para o agent-spec.md e para o lab-04.
+```
