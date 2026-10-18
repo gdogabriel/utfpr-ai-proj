@@ -41,20 +41,30 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 #### Considerações do domínio
 
-- Parada não planejada (falha) gera alto custo de produção, perda de insumos e afeta a qualidade. 
+- Parada não planejada (falha) gera alto custo de produção, perda de insumos e afeta a qualidade.
 - Parada preventiva indevida gera custo de oportunidade e consome capacidade limitada da equipe técnica.
 
-#### Plano de métricas
+#### Métrica Principal: Taxa de Captura de Falhas (Recall)
 
-- Métrica principal: taxa de falhas nas máquinas numa janela de tempo.
-  - Objetivo: minimizar (manter abaixo da baseline) ou zerar (sucesso total) a taxa de falhas nas máquinas.
-  - Fórmula: `número de falhas / total de medições` em uma janela de tempo.
-  - Contexto: o agente orientará técnicos informando se as máquinas podem falhar em breve (calculando o risco, justificativa, bloqueio, normas, confiança), auxiliando assim na priorização de máquinas e o procedimento para fazer manutenção.
+Mede a capacidade do agente de identificar e recomendar intervenção (bloqueio) em máquinas com risco real de quebra.
 
-- Métrica secundária: número de bloqueios numa janela de tempo.
-  - Objetivo: minimizar o número de manutenções
-  - Fórmula: `número de bloqueios / total de medições`
-  - Contexto: ter máquinas paradas diminuem a produção. Isso reduz o lucro da empresa. Com a métrica primária, o agente poderia recomendar o bloqueio em todas as ordens de serviço. Esta métrica é um contra peso de performance do agente.
+- **Fórmula:** F = A / T
+  - **F:** Taxa de captura de falhas (recall).
+  - **A:** Número de casos que identificou risco alto ou recomendou intervenção e teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 1`.
+  - **T:** Número total de casos com falha real, isto é, `Machine failure == 1`.
+- **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
+- **Limiar de sucesso:** F >= 80% de captura de falhas (a ser definido).
+
+#### Métrica Secundária: Taxa de Falsos Positivos
+
+Mede o impacto do agente na produção, evitando paradas e bloqueios indevidos em máquinas saudáveis. É esperado que ocorram paradas para manutenção preventiva. Esta métrica é um contrapeso de performance do agente.
+
+- **Fórmula:** FP = B / S
+  - **FP:** Taxa de falsos positivos.
+  - **B:** Número de casos que identificou risco alto ou recomendou intervenção e não teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 0`.
+  - **S:** Número total de casos sem falha, isto é, `Machine failure == 0`.
+- **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
+- **Limiar de sucesso:** FP <= 20% (a ser definido).
 
 ### Environment:
 
