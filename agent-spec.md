@@ -86,14 +86,17 @@ Os atuadores definem as informações de apoio que o agente apresenta na tela do
 
 ### Sensors:
 
-- ler ordem de serviço
-  - ler descrição da intervenção
-  - ler identificador e tipo da máquina
-  - ler temperaturas de ar e processo
-  - ler rotação e torque do fuso
-  - ler minutos de desgaste da ferramenta
-  - ler se há falha na máquina (`Machine failure`)
-  - ler qual é o modo de falha
+Os sensores definem os canais de entrada percebidos pelo agente a cada chamada:
+
+- **Entrada da Ordem de Serviço:** Texto da solicitação e identificadores da máquina (\`Product ID\` e \`Type\`).
+- **Telemetria de Sensores Físicos:**
+  - Temperatura do ar (`Air temperature [K]`).
+  - Temperatura do processo (`Process temperature [K]`).
+  - Velocidade de rotação (`Rotational speed [rpm]`).
+  - Torque (`Torque [Nm]`).
+  - Tempo de desgaste da ferramenta (`Tool wear [min]`).
+
+> **Nota de Restrição de Percepção:** O indicador de falha real (`Machine failure`) e os rótulos de modos de falha **não são visíveis** para o agente.
 
 ---
 
