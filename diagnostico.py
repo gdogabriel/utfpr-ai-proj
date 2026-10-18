@@ -70,32 +70,65 @@ class Verificacao:
     # e não muda a conclusão.
     essencial: bool
 
-# O caso "pedidos travados na fila do agente": três hipóteses concorrentes
-# (limite de cota da API, credencial vencida, fila do provedor instável).
-CASO_PEQUENO: tuple[Verificacao, ...] = (
-    Verificacao("chamar a rota de saúde do provedor", 2.0, False, True),
-    Verificacao("conferir o painel de cota da chave", 3.0, True, True),
-    Verificacao("renovar a credencial em ambiente isolado", 8.0, False, True),
-    Verificacao("olhar o log do último pedido bem-sucedido", 5.0, False, False),
-    Verificacao("reproduzir o erro com carga mínima", 12.0, False, False),
-    Verificacao("comparar a latência fora e dentro da rede", 10.0, True, False),
+# O caso concreto do Assistente de Manutenção Segura (AMS)
+# Mapeia as regras de telemetria do dataset AI4I 2020 para esta Ordem de Serviço
+CASO_AMS: tuple[Verificacao, ...] = (
+    # --- VERIFICAÇÕES ESSENCIAIS ---
+    # Necessárias para fechar o laudo de risco com confiança suficiente.
+    # 1. Sanity Check (Barato)
+    Verificacao(
+        nome="Validar integridade e limites físicos dos sensores (Sanity Check)",
+        tempo=0.5, # milissegundos (uma checagem de intervalo min/max é extremamente rápida)
+        positivo=False, # False = leituras válidas; True = detectou dado absurdo/corrompido
+        essencial=True # É obrigatória: sem dados válidos, o laudo fica comprometido
+    ),
+    # 2. Regras Lógicas de Telemetria (Custo Médio)
+    Verificacao(
+        nome="Validar dissipação de calor e diferença de temperatura (HDF)",
+        tempo=2.5,  # milissegundos
+        positivo=True,  # Anomalia confirmada nesta OS (temp. do ar vs. processo)
+        essencial=True,
+    ),
+    Verificacao(
+        nome="Validar limite de potência mecânica e torque (PWF)",
+        tempo=3.0,  # milissegundos
+        positivo=True,  # Anomalia confirmada nesta OS (relação torque x rotação)
+        essencial=True,
+    ),
+    Verificacao(
+        nome="Validar limite de desgaste da ferramenta (TWF)",
+        tempo=1.5,  # milissegundos
+        positivo=False,  # Leitura normal (tempo de desgaste dentro do limite)
+        essencial=True,
+    ),
+    Verificacao(
+        nome="Validar sobretensão por esforço combinado no fuso (OSF)",
+        tempo=3.5,  # milissegundos
+        positivo=False,  # Leitura normal para esta OS
+        essencial=True,
+    ),
+    # 3. Inferência de Machine Learning / Rede Neural (Custo Maior)
+    Verificacao(
+        nome="Inferir probabilidade de falha via Rede Neural (AI4I 2020)",
+        tempo=15.0,
+        positivo=True,
+        essencial=True,
+    ),
+    # --- VERIFICAÇÕES DE ROTINA ---
+    # Não essenciais: consomem tempo computacional sem alterar a conclusão do laudo.
+    Verificacao(
+        nome="Verificar oscilações aleatórias de sinal e ruído nos sensores (RNF)",
+        tempo=4.0,  # milissegundos
+        positivo=False,
+        essencial=False,
+    ),
+    Verificacao(
+        nome="Validar classe de tolerância do produto (Type L/M/H na OS)",
+        tempo=1.0, # milissegundos
+        positivo=False,
+        essencial=False,
+    ),
 )
-
-CASO_MAIOR: tuple[Verificacao, ...] = (
-    Verificacao("chamar a rota de saúde do provedor", 2.0, False, True),
-    Verificacao("conferir o painel de cota da chave", 3.0, True, True),
-    Verificacao("renovar a credencial em ambiente isolado", 8.0, False, True),
-    Verificacao("abrir o painel de erros 5xx do gateway", 4.0, False, True),
-    Verificacao("conferir o limite de requisições por minuto", 3.0, False, True),
-    Verificacao("olhar o log do último pedido bem-sucedido", 5.0, False, False),
-    Verificacao("reproduzir o erro com carga mínima", 12.0, False, False),
-    Verificacao("comparar a latência fora e dentro da rede", 10.0, True, False),
-    Verificacao("pedir rastro a um cliente que funciona", 15.0, False, False),
-    Verificacao("conferir o versionamento do certificado TLS", 9.0, False, False),
-    Verificacao("medir o relógio do servidor contra o NTP", 6.0, False, False),
-    Verificacao("inspecionar a fila de mensagens mortas", 11.0, True, False),
-)
-
 
 class Diagnostico:
     """O problema de busca: em que ordem fazer as verificações do caso.
@@ -214,5 +247,5 @@ class Diagnostico:
         return 3.0 * faltam - 2.0 * ja_feito
 
 
-PEQUENA = Diagnostico(CASO_PEQUENO)
-MAIOR = Diagnostico(CASO_MAIOR)
+# Instância do problema de busca com as verificações do AMS
+AMS = Diagnostico(CASO_AMS)
