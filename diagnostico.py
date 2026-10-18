@@ -1,22 +1,36 @@
 """Subproblema 1 do catálogo: a ordem das verificações num diagnóstico.
 
-A formulação vem do plano da D2, seção 9 (catálogo de subproblemas):
-Estado: conjunto de verificações já feitas e seus resultados. Ação: fazer a
-próxima verificação. Custo: tempo da verificação. Objetivo: chegar a uma
-conclusão com confiança suficiente.
+FORMULAÇÃO
+Esta formulação vem do plano da D2, seção 9 (catálogo de subproblemas).
+- Estado: o conjunto das verificações já feitas e os resultados delas.
+- Ação: fazer a próxima verificação.
+- Custo: o tempo da verificação.
+- Objetivo: chegar a uma conclusão com confiança suficiente.
 
-O caso concreto é determinístico: cada verificação tem um resultado fixo
-(confirma a hipótese principal ou descarta uma alternativa). Por isso o
-estado guarda as feitas e as que deram positivo — as positivas derivam das
-feitas, e ficam no estado para casar com a formulação e deixar claro que um
-resultado é observação, não escolha do agente.
+CASO DETERMINÍSTICO
+O caso concreto é determinístico. Cada verificação tem um resultado fixo.
+O resultado é um destes dois:
+- confirma a hipótese principal;
+- descarta uma hipótese alternativa.
 
-A "confiança suficiente" do caso está operacionalizada assim: o laudo exige
-as verificações ESSENCIAIS — as que distinguem as hipóteses. As demais são
-de rotina: verificá-las custa tempo e não muda a conclusão.
+Por isso o estado guarda dois grupos: as verificações feitas e as
+verificações com resultado positivo.
+As positivas derivam das feitas. Elas ficam no estado por dois motivos:
+1. Elas seguem a formulação.
+2. Elas mostram que o resultado é uma observação.
+   O agente não escolhe o resultado.
 
-Os dados do caso são inventados e moram nas constantes do módulo — troque
-pelas do seu domínio (lab-03) sem tocar na classe.
+CONFIANÇA SUFICIENTE
+No caso, "confiança suficiente" tem este significado:
+o laudo exige as verificações ESSENCIAIS.
+As verificações essenciais distinguem as hipóteses.
+As outras verificações são de rotina.
+Uma verificação de rotina gasta tempo e não muda a conclusão.
+
+DADOS
+Os dados do caso são inventados. Eles ficam nas constantes do módulo.
+Para usar o seu domínio (lab-03), troque as constantes.
+Não mude a classe.
 """
 
 from __future__ import annotations
