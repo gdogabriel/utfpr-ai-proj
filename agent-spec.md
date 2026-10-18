@@ -127,7 +127,7 @@ Perguntas que guiam o preenchimento (uma por dimensão):
 | Episódico ou sequencial   | Episódico           | A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes.A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes. |
 | Estático ou dinâmico      | Dinâmico            | O estado físico da máquina e os dados de telemetria continuam mudando na fábrica enquanto o agente processa a solicitação. |
 | Discreto ou contínuo      | Contínuo            | As medições físicas de telemetria variam em escalas numéricas contínuas, exigindo a discretização dos valores para a tomada de decisão. |
-| Conhecido ou desconhecido | conhecido           | Considerando a base histórica de 10 mil linhas, e normas dadas, pode-se elaborar regras e definições que serão o contexto com regras fixas para tomada de decisões racionais, por isso é o conhecido.                                                                                                               |
+| Conhecido ou desconhecido | Conhecido           | As regras de decisão e os critérios de risco são estabelecidos previamente a partir do histórico de dados e das normas de segurança (NRs). |
 
 ---
 
