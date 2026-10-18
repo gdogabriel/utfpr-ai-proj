@@ -78,17 +78,11 @@ O agente opera em uma planta industrial de manufatura. O ambiente contém os seg
 
 ### Actuators:
 
-- validar leitura dos sensores: aceitar ou rejeitar valores impossíveis
-- calcular o nível risco de falha da máquina (baixo / médio / alto)
-- desenvolver justificativa textual em português, para o técnico entender o porquê do nível de risco
-- estimar confiança (percentual)
-- decidir se a intervenção exige bloqueio e etiquetagem
-  - `requer_bloqueio` = `true` | `false`
-- identificar normas regulamentares aplicáveis de intervenção, ou marcar `NENHUMA`:
-  - NR-10 se houver instalação
-    elétrica;
-  - NR-12 para máquinas e equipamentos;
-  - NR-35 para trabalho em altura.
+Os atuadores definem as informações de apoio que o agente apresenta na tela do técnico:
+
+- **Informar Nível de Risco e Confiança:** Apresentar a classificação do risco de falha (`baixo`, `médio` ou `alto`), a justificativa técnica e o percentual de confiança.
+- **Indicar Normas Aplicáveis:** Apontar as normas de segurança necessárias para a intervenção (`NR-10`, `NR-12`, `NR-35` ou `NENHUMA`).
+- **Recomendar Bloqueio de Segurança:** Indicar se a intervenção exige bloqueio físico e etiquetagem (`requer_bloqueio = true | false`).
 
 ### Sensors:
 
