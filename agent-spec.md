@@ -119,15 +119,15 @@ Perguntas que guiam o preenchimento (uma por dimensão):
 
 **Quando se preenche:** no Laboratório 02, no sábado (encontro 2).
 
-| Dimensão                  | Minha classificação | Justificativa (uma frase)                                                                                                                                                                                                                                                                                           |
-| ------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Observabilidade           | Parcial             | Os sensores medem variáveis físicas do instante, mas não capturam ruídos de medição, histórico de manutenção nem desgastes internos ocultos da máquina.                                                                                                                                                             |
-| Número de agentes         | Único               | O agente processa cada ordem de serviço de forma isolada, sem cooperação ou competição direta com outros agentes de software na deliberação.                                                                                                                                                                        |
-| Determinismo              | Estocástico         | A mesma leitura de sensores pode resultar em falha ou não no mundo físico, e as chamadas ao modelo de linguagem possuem resposta probabilística.                                                                                                                                                                    |
-| Episódico ou sequencial   | Episódico           | A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes.A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes. |
-| Estático ou dinâmico      | Dinâmico            | O estado físico da máquina e os dados de telemetria continuam mudando na fábrica enquanto o agente processa a solicitação. |
-| Discreto ou contínuo      | Contínuo            | As medições físicas de telemetria variam em escalas numéricas contínuas, exigindo a discretização dos valores para a tomada de decisão. |
-| Conhecido ou desconhecido | Conhecido           | As regras de decisão e os critérios de risco são estabelecidos previamente a partir do histórico de dados e das normas de segurança (NRs). |
+| Dimensão | Minha classificação | Justificativa (uma frase) |
+|----------|---------------------|---------------------------|
+| Observabilidade | Parcial | Os sensores medem variáveis físicas do instante, mas não capturam ruídos de medição, histórico de manutenção nem desgastes internos ocultos da máquina. |
+| Número de agentes | Único | O agente processa cada ordem de serviço de forma isolada, sem cooperação ou competição direta com outros agentes de software na deliberação. |
+| Determinismo | Estocástico | A mesma leitura de sensores pode resultar em falha ou não no mundo físico, e as chamadas ao modelo de linguagem possuem resposta probabilística. |
+| Episódico ou sequencial | Episódico | A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes.A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes. |
+| Estático ou dinâmico | Dinâmico | O estado físico da máquina e os dados de telemetria continuam mudando na fábrica enquanto o agente processa a solicitação. |
+| Discreto ou contínuo | Contínuo | As medições físicas de telemetria variam em escalas numéricas contínuas, exigindo a discretização dos valores para a tomada de decisão. |
+| Conhecido ou desconhecido | Conhecido | As regras de decisão e os critérios de risco são estabelecidos previamente a partir do histórico de dados e das normas de segurança (NRs). |
 
 ---
 
