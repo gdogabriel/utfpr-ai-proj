@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** Assistente de Manutenção Segura
-**Autor(a):** Gabriel Duarte · **Última revisão:** 10/10/2026
+**Autor(a):** Gabriel Duarte · **Última revisão:** 17/10/2026
 
 ---
 
