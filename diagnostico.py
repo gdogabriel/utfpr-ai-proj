@@ -100,31 +100,57 @@ CASO_MAIOR: tuple[Verificacao, ...] = (
 class Diagnostico:
     """O problema de busca: em que ordem fazer as verificações do caso.
 
-    O estado é o par (verificações feitas, verificações com resultado
-    positivo), cada um como tupla ordenada — por isso estados iguais são
-    o mesmo hash, não importa a ordem em que as verificações foram feitas.
+    Esta classe tem os componentes da formulação.
+    O motor de busca usa estes membros:
+    estado_inicial, acoes, transicao, objetivo e custo.
+
+    ESTADO
+    O estado é um par de duas tuplas:
+    - a primeira tem as verificações feitas;
+    - a segunda tem as verificações com resultado positivo.
+    Cada tupla fica ordenada pelo nome.
+    Por isso dois caminhos com as mesmas verificações dão o mesmo estado.
+    Estados iguais têm o mesmo hash.
+    A ordem em que o agente fez as verificações não importa.
     """
 
     def __init__(self, verificacoes: tuple[Verificacao, ...]):
+        # Todas as verificações do caso.
         self.verificacoes = verificacoes
+        # Dicionário para achar uma verificação pelo nome.
+        # A chave é o nome. O valor é a verificação.
+        # O sublinhado no início indica uso interno da classe.
         self._por_nome = {v.nome: v for v in verificacoes}
+        # Estado inicial: nenhuma verificação feita.
+        # Também não há resultado positivo.
         self.estado_inicial: tuple[tuple[str, ...], tuple[str, ...]] = ((), ())
 
     def acoes(self, estado: tuple[tuple[str, ...], tuple[str, ...]]) -> list[str]:
+        # Devolve os nomes das verificações que ainda não foram feitas.
+        # Cada nome é uma ação possível neste estado.
+        # O "_" ignora as positivas. Esta função não precisa delas.
         feitas, _ = estado
         return [v.nome for v in self.verificacoes if v.nome not in feitas]
 
     def transicao(
         self, estado: tuple[tuple[str, ...], tuple[str, ...]], acao: str,
     ) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        # Devolve o estado que resulta de fazer a ação.
+        # Esta função não muda o estado recebido. Ela cria um estado novo.
+        # O mesmo estado e a mesma ação sempre dão o mesmo resultado.
         feitas, positivas = estado
         verificacao = self._por_nome[acao]
+        # A ação sempre entra em "feitas".
         novas_feitas = tuple(sorted((*feitas, acao)))
+        # A ação só entra em "positivas" se o resultado for positivo.
         if verificacao.positivo:
             return novas_feitas, tuple(sorted((*positivas, acao)))
         return novas_feitas, positivas
 
     def objetivo(self, estado: tuple[tuple[str, ...], tuple[str, ...]]) -> bool:
+        # Devolve True se o estado é um objetivo.
+        # O estado é um objetivo quando todas as verificações essenciais
+        # estão em "feitas". As verificações de rotina não importam.
         feitas, _ = estado
         essenciais = {v.nome for v in self.verificacoes if v.essencial}
         return essenciais.issubset(feitas)
@@ -135,16 +161,24 @@ class Diagnostico:
         acao: str,
         estado_seguinte: tuple[tuple[str, ...], tuple[str, ...]],
     ) -> float:
+        # Devolve o custo de UM passo: o tempo da verificação.
+        # O custo do caminho é a soma dos custos dos passos.
+        # Aqui o custo só depende da ação.
+        # Por isso a função não usa "estado" nem "estado_seguinte".
+        # Eles existem porque o motor de busca chama a função com os três.
         return self._por_nome[acao].tempo
 
     def heuristica_admissivel(
         self, estado: tuple[tuple[str, ...], tuple[str, ...]],
     ) -> float:
-        """Soma dos tempos das essenciais que ainda faltam.
+        """Estima o custo que falta até o objetivo.
 
-        Admissível: cada essencial que falta ainda precisará ser feita e
-        custa exatamente o seu tempo — o laudo não fecha sem elas. Ignora
-        as não essenciais, que nunca são obrigatórias.
+        Valor: a soma dos tempos das essenciais que ainda faltam.
+
+        Esta heurística é admissível: ela nunca passa do custo real.
+        Cada essencial que falta precisa ser feita e custa o seu tempo.
+        O objetivo não é atingido sem elas.
+        A função ignora as não essenciais, porque elas nunca são obrigatórias.
         """
         feitas, _ = estado
         return sum(
@@ -154,16 +188,24 @@ class Diagnostico:
     def heuristica_inadmissivel(
         self, estado: tuple[tuple[str, ...], tuple[str, ...]],
     ) -> float:
-        """O progresso que desconta: o que falta vale 3×, o que foi feito abate 2×.
+        """Estima o custo que falta, mas de forma errada.
 
-        NÃO é admissível, e é tentadora por isso: "quanto falta ainda é o
-        problema, e cada coisa que já chequei me adiantou" é a contagem de
-        progresso que se escreve de primeira — ela trata verificação cara e
-        barata como o mesmo passo e abate o feito duas vezes. Superestima o
-        trecho que falta quando a essencial pendente é barata, vira negativa
-        quando já se gastou tempo de mais, e faz o A* preferir caminhos que
-        acumulam verificações — o caminho devolvido sai mais caro que o
-        ótimo (o lab-05 mede isso).
+        Esta função existe para o lab-05 medir o efeito do erro.
+
+        Valor: 3 × (tempo das essenciais que faltam)
+               − 2 × (tempo de tudo que já foi feito).
+
+        Esta heurística NÃO é admissível.
+        Ela parece correta à primeira vista:
+        o que falta é o problema, e cada verificação feita é progresso.
+        Uma contagem de progresso escrita de primeira costuma ficar assim.
+
+        Os erros:
+        - Ela abate o que foi feito duas vezes.
+        - Ela superestima o que falta quando a essencial pendente é barata.
+        - Ela fica negativa quando já se gastou tempo demais.
+        - Ela faz o A* preferir caminhos que acumulam verificações.
+        - O caminho devolvido custa mais que o ótimo. O lab-05 mede isso.
         """
         feitas, _ = estado
         faltam = sum(v.tempo for v in self.verificacoes
