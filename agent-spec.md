@@ -68,11 +68,13 @@ Mede o impacto do agente na produção, evitando paradas e bloqueios indevidos e
 
 ### Environment:
 
-- planta industrial com as máquinas.
-- sistema de monitoramento das máquinas.
-- base de dados de sensores.
-- normas regulamentares de intervenção NR-10, NR-12, NR-35.
-- técnico que recebe o relatório gerado pelo agente.
+O agente opera em uma planta industrial de manufatura. O ambiente contém os seguintes elementos:
+
+- **Físico:** Máquinas de usinagem em operação e variações de temperatura ambiente.
+- **Sensores e Telemetria:** Fluxo de dados operacionais (temperatura do ar e do processo, velocidade, torque e desgaste da ferramenta).
+- **Documentos:** Normas de segurança do trabalho (NR-10, NR-12 e NR-35) e manuais de manutenção.
+- **Pessoas:** Técnico de manutenção (usuário principal) e operadores da produção.
+- **Incertezas:** Ruídos de medição nos sensores e ocorrência de falhas aleatórias.
 
 ### Actuators:
 
