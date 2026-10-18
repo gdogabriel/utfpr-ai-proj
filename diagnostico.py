@@ -40,13 +40,35 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Verificacao:
-    """Uma verificação que o diagnóstico pode fazer."""
+    """Um passo do diagnóstico.
 
+    O diagnóstico faz verificações para achar a causa de um problema.
+    Cada verificação tem um tempo e um resultado.
+    O resultado é fixo neste caso: ele não muda entre execuções.
+
+    Esta classe só guarda dados. Ela não executa a verificação.
+    Depois de criada, a verificação não muda.
+    """
+
+    # Nome da verificação. Cada verificação tem um nome diferente.
+    # O programa usa o nome para identificar a verificação.
     nome: str
-    tempo: float      # custo de executá-la (minutos)
-    positivo: bool    # o resultado NESTE caso (o caso é fixo)
-    essencial: bool   # precisa entrar no laudo para a confiança suficiente
 
+    # Tempo para fazer a verificação, em milissegundos.
+    # Este valor é o custo da ação.
+    tempo: float
+
+    # O resultado da verificação neste caso. O resultado é fixo.
+    # True: o resultado confirma a hipótese principal.
+    # False: o resultado descarta uma hipótese alternativa.
+    # O programa só registra este valor no estado.
+    positivo: bool
+
+    # True: o objetivo exige esta verificação.
+    # O diagnóstico só termina quando todas as essenciais estão feitas.
+    # False: a verificação é de rotina. Ela gasta tempo
+    # e não muda a conclusão.
+    essencial: bool
 
 # O caso "pedidos travados na fila do agente": três hipóteses concorrentes
 # (limite de cota da API, credencial vencida, fila do provedor instável).
