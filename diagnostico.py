@@ -30,7 +30,6 @@ Uma verificação de rotina gasta tempo e não muda a conclusão.
 DADOS
 Os dados do caso são inventados. Eles ficam nas constantes do módulo.
 Para usar o seu domínio (lab-03), troque as constantes.
-Não mude a classe.
 """
 
 from __future__ import annotations
@@ -50,8 +49,10 @@ class Verificacao:
     Depois de criada, a verificação não muda.
     """
 
-    # Nome da verificação. Cada verificação tem um nome diferente.
-    # O programa usa o nome para identificar a verificação.
+    # Identificador estável e único da verificação.
+    id: str
+
+    # Nome legível da verificação.
     nome: str
 
     # Tempo para fazer a verificação, em milissegundos.
@@ -70,6 +71,9 @@ class Verificacao:
     # e não muda a conclusão.
     essencial: bool
 
+    # IDs das verificações que precisam ser feitas antes desta.
+    dependencias: tuple[str, ...] = ()
+
 # O caso concreto do Assistente de Manutenção Segura (AMS)
 # Mapeia as regras de telemetria do dataset AI4I 2020 para esta Ordem de Serviço
 CASO_AMS: tuple[Verificacao, ...] = (
@@ -77,6 +81,7 @@ CASO_AMS: tuple[Verificacao, ...] = (
     # Necessárias para fechar o laudo de risco com confiança suficiente.
     # 1. Sanity Check (Barato)
     Verificacao(
+        id="sanity-check",
         nome="Validar integridade e limites físicos dos sensores (Sanity Check)",
         tempo=0.5, # milissegundos (uma checagem de intervalo min/max é extremamente rápida)
         positivo=False, # False = leituras válidas; True = detectou dado absurdo/corrompido
@@ -84,45 +89,58 @@ CASO_AMS: tuple[Verificacao, ...] = (
     ),
     # 2. Regras Lógicas de Telemetria (Custo Médio)
     Verificacao(
+        id="hdf",
         nome="Validar dissipação de calor e diferença de temperatura (HDF)",
         tempo=2.5,  # milissegundos
         positivo=True,  # Anomalia confirmada nesta OS (temp. do ar vs. processo)
         essencial=True,
+        dependencias=("sanity-check",),
     ),
     Verificacao(
+        id="pwf",
         nome="Validar limite de potência mecânica e torque (PWF)",
         tempo=3.0,  # milissegundos
         positivo=True,  # Anomalia confirmada nesta OS (relação torque x rotação)
         essencial=True,
+        dependencias=("sanity-check",),
     ),
     Verificacao(
+        id="twf",
         nome="Validar limite de desgaste da ferramenta (TWF)",
         tempo=1.5,  # milissegundos
         positivo=False,  # Leitura normal (tempo de desgaste dentro do limite)
         essencial=True,
+        dependencias=("sanity-check",),
     ),
     Verificacao(
+        id="osf",
         nome="Validar sobretensão por esforço combinado no fuso (OSF)",
         tempo=3.5,  # milissegundos
         positivo=False,  # Leitura normal para esta OS
         essencial=True,
+        dependencias=("sanity-check",),
     ),
     # 3. Inferência de Machine Learning / Rede Neural (Custo Maior)
     Verificacao(
+        id="ml-failure-probability",
         nome="Inferir probabilidade de falha via Rede Neural (AI4I 2020)",
         tempo=15.0,
         positivo=True,
         essencial=True,
+        dependencias=("sanity-check",),
     ),
     # --- VERIFICAÇÕES DE ROTINA ---
     # Não essenciais: consomem tempo computacional sem alterar a conclusão do laudo.
     Verificacao(
+        id="sensor-noise",
         nome="Verificar oscilações aleatórias de sinal e ruído nos sensores (RNF)",
         tempo=4.0,  # milissegundos
         positivo=False,
         essencial=False,
+        dependencias=("sanity-check",),
     ),
     Verificacao(
+        id="product-type-tolerance",
         nome="Validar classe de tolerância do produto (Type L/M/H na OS)",
         tempo=1.0, # milissegundos
         positivo=False,
@@ -139,9 +157,9 @@ class Diagnostico:
 
     ESTADO
     O estado é um par de duas tuplas:
-    - a primeira tem as verificações feitas;
-    - a segunda tem as verificações com resultado positivo.
-    Cada tupla fica ordenada pelo nome.
+    - a primeira tem os IDs das verificações feitas;
+    - a segunda tem os IDs das verificações com resultado positivo.
+    Cada tupla fica ordenada pelo ID.
     Por isso dois caminhos com as mesmas verificações dão o mesmo estado.
     Estados iguais têm o mesmo hash.
     A ordem em que o agente fez as verificações não importa.
@@ -150,20 +168,26 @@ class Diagnostico:
     def __init__(self, verificacoes: tuple[Verificacao, ...]):
         # Todas as verificações do caso.
         self.verificacoes = verificacoes
-        # Dicionário para achar uma verificação pelo nome.
-        # A chave é o nome. O valor é a verificação.
+        # Dicionário para achar uma verificação pelo ID.
+        # A chave é o ID. O valor é a verificação.
         # O sublinhado no início indica uso interno da classe.
-        self._por_nome = {v.nome: v for v in verificacoes}
+        self._por_id = {v.id: v for v in verificacoes}
         # Estado inicial: nenhuma verificação feita.
         # Também não há resultado positivo.
         self.estado_inicial: tuple[tuple[str, ...], tuple[str, ...]] = ((), ())
 
     def acoes(self, estado: tuple[tuple[str, ...], tuple[str, ...]]) -> list[str]:
-        # Devolve os nomes das verificações que ainda não foram feitas.
-        # Cada nome é uma ação possível neste estado.
-        # O "_" ignora as positivas. Esta função não precisa delas.
+        # Devolve os IDs das verificações disponíveis.
+        # A verificação não pode estar concluída.
+        # Todas as dependências da verificação devem estar concluídas.
+        # O "_" ignora os resultados positivos. Esta função não usa esses resultados.
         feitas, _ = estado
-        return [v.nome for v in self.verificacoes if v.nome not in feitas]
+        feitas_ids = set(feitas)
+        return [
+            v.id for v in self.verificacoes
+            if v.id not in feitas_ids
+            and all(dependencia in feitas_ids for dependencia in v.dependencias)
+        ]
 
     def transicao(
         self, estado: tuple[tuple[str, ...], tuple[str, ...]], acao: str,
@@ -172,7 +196,7 @@ class Diagnostico:
         # Esta função não muda o estado recebido. Ela cria um estado novo.
         # O mesmo estado e a mesma ação sempre dão o mesmo resultado.
         feitas, positivas = estado
-        verificacao = self._por_nome[acao]
+        verificacao = self._por_id[acao]
         # A ação sempre entra em "feitas".
         novas_feitas = tuple(sorted((*feitas, acao)))
         # A ação só entra em "positivas" se o resultado for positivo.
@@ -185,7 +209,7 @@ class Diagnostico:
         # O estado é um objetivo quando todas as verificações essenciais
         # estão em "feitas". As verificações de rotina não importam.
         feitas, _ = estado
-        essenciais = {v.nome for v in self.verificacoes if v.essencial}
+        essenciais = {v.id for v in self.verificacoes if v.essencial}
         return essenciais.issubset(feitas)
 
     def custo(
@@ -199,7 +223,7 @@ class Diagnostico:
         # Aqui o custo só depende da ação.
         # Por isso a função não usa "estado" nem "estado_seguinte".
         # Eles existem porque o motor de busca chama a função com os três.
-        return self._por_nome[acao].tempo
+        return self._por_id[acao].tempo
 
     def heuristica_admissivel(
         self, estado: tuple[tuple[str, ...], tuple[str, ...]],
@@ -215,7 +239,7 @@ class Diagnostico:
         """
         feitas, _ = estado
         return sum(
-            v.tempo for v in self.verificacoes if v.essencial and v.nome not in feitas
+            v.tempo for v in self.verificacoes if v.essencial and v.id not in feitas
         )
 
     def heuristica_inadmissivel(
@@ -242,8 +266,8 @@ class Diagnostico:
         """
         feitas, _ = estado
         faltam = sum(v.tempo for v in self.verificacoes
-                     if v.essencial and v.nome not in feitas)
-        ja_feito = sum(self._por_nome[nome].tempo for nome in feitas)
+                     if v.essencial and v.id not in feitas)
+        ja_feito = sum(self._por_id[id_verificacao].tempo for id_verificacao in feitas)
         return 3.0 * faltam - 2.0 * ja_feito
 
 
