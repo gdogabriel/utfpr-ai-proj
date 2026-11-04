@@ -122,7 +122,7 @@ Perguntas que guiam o preenchimento (uma por dimensão):
 | Dimensão | Minha classificação | Justificativa (uma frase) |
 |----------|---------------------|---------------------------|
 | Observabilidade | Parcial | Os sensores medem variáveis físicas do instante, mas não capturam ruídos de medição, histórico de manutenção nem desgastes internos ocultos da máquina. |
-| Número de agentes | Único | O agente processa cada ordem de serviço de forma isolada e autônoma, sem cooperação ou competição direta com outros agentes na deliberação. |
+| Número de agentes | Único | Considerando o escopo de deliberar sobre a OS, o agente processa cada ordem de serviço de forma isolada e autônoma antes de entregar a recomendação, sem interação com outros agentes. |
 | Determinismo | Estocástico | A mesma leitura de sensores pode resultar em falha ou não no mundo físico, e as chamadas ao modelo de linguagem possuem resposta probabilística. |
 | Episódico ou sequencial | Episódico | A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes. |
 | Estático ou dinâmico | Dinâmico | As variáveis telemétricas da máquina continuam mudando na fábrica durante a deliberação, tornando inválidas as respostas atrasadas. |
