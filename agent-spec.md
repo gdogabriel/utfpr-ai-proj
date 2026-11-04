@@ -144,8 +144,14 @@ Perguntas que guiam o preenchimento:
 
 **Quando se preenche:** no sábado (encontro 2, manhã).
 
-[o tipo mais simples que resolve, justificado pela dimensão
-do ambiente que o obriga]
+**Tipo escolhido:** Agente baseado em objetivos.
+
+**Justificativa:**
+
+1. **A Observabilidade Parcial elimina o Tipo 1 (Reativo simples).** Os sensores medem variáveis físicas do instante, mas sofrem ruídos de medição e não capturam desgastes internos ocultos da máquina.
+2. **O Tipo 2 (Baseado em modelo) é insuficiente pois controla apenas o estado interno dos passos já executados.** Saber quais verificações já rodaram (e seus resultados) evita repetir etapas na OS, mas o Tipo 2 não avalia qual sequência de ações chega mais rápido ao laudo final.
+3. **O ambiente Conhecido, Contínuo (discretizado) e Dinâmico exige o Tipo 3 (Baseado em objetivos).** O agente discretiza a telemetria em verificações conhecidas e usa busca para atingir o objetivo (concluir as verificações essenciais) no menor tempo, evitando respostas atrasadas.
+4. **O objetivo binário dispensa o Tipo 4 (Baseado em utilidade).** Como o teste de objetivo é binário (satisfaz ou não satisfaz) e limiares fixos já equilibram as métricas $F$ e $FP$, o Tipo 3 é o mais simples que resolve.
 
 ---
 
