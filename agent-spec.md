@@ -53,7 +53,7 @@ Mede a capacidade do agente de identificar e recomendar intervenção (bloqueio)
   - **A:** Número de casos que identificou risco alto ou recomendou intervenção e teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 1`.
   - **T:** Número total de casos com falha real, isto é, `Machine failure == 1`.
 - **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
-- **Limiar de sucesso:** F >= 80% de captura de falhas (a ser definido).
+- **Limiar de sucesso:** F >= 97.35% de captura de falhas (referência obtida pelo [agente reativo simples](data/performance-agente-reativo-simples.md) na base completa de 10.000 casos).
 
 #### Métrica Secundária: Taxa de Falsos Positivos
 
@@ -64,7 +64,7 @@ Mede o impacto do agente na produção, evitando paradas e bloqueios indevidos e
   - **B:** Número de casos que identificou risco alto ou recomendou intervenção e não teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 0`.
   - **S:** Número total de casos sem falha, isto é, `Machine failure == 0`.
 - **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
-- **Limiar de sucesso:** FP <= 20% (a ser definido).
+- **Limiar de sucesso:** FP <= 7.02% (referência obtida pelo [agente reativo simples](data/performance-agente-reativo-simples.md) na base completa de 10.000 casos).
 
 ### Environment:
 

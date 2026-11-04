@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "test": ".venv/bin/python -m pytest",
+    "d2:lab1:formula-performance-agente-reativo-simples:amostra": ".venv/bin/python data/performance-agente-reativo-simples.py data/amostra/ai4i2020.csv",
+    "d2:lab1:formula-performance-agente-reativo-simples:completa": ".venv/bin/python data/performance-agente-reativo-simples.py data/raw/ai4i2020.csv",
+    "d2:lab4:verificar-formulacao": ".venv/bin/python verificar-formulacao.py diagnostico.py:AMS",
+    "d2:lab4:buscas": ".venv/bin/python esqueleto-lab4.py",
+    "d2:lab5:heuristicas": ".venv/bin/python esqueleto-lab5.py",
+    "d2:lab6:testes": "cd d2/lab6 && ../../.venv/bin/python -m pytest teste.py -q",
+    "d2:lab6:medir": "cd d2/lab6 && ../../.venv/bin/python medir.py"
+  }
+}
