@@ -34,7 +34,7 @@ Para usar o seu domínio (lab-03), troque as constantes.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 
 @dataclass(frozen=True)
@@ -148,6 +148,39 @@ CASO_AMS: tuple[Verificacao, ...] = (
     ),
 )
 
+# Caso de teste: o propósito deste caso é apenas testar um arranjo diferente de
+# dependências. Possui dez verificações independentes na base e uma cadeia com
+# profundidade máxima de cinco verificações. A última é essencial para testar
+# a propagação da essencialidade pelas dependências.
+CASO_TESTE_DEPENDENCIAS: tuple[Verificacao, ...] = (
+    Verificacao("raiz-01", "Verificação de teste da raiz 1", 1.0, False, False),
+    Verificacao("raiz-02", "Verificação de teste da raiz 2", 1.0, False, False),
+    Verificacao("raiz-03", "Verificação de teste da raiz 3", 1.0, False, False),
+    Verificacao("raiz-04", "Verificação de teste da raiz 4", 1.0, False, False),
+    Verificacao("raiz-05", "Verificação de teste da raiz 5", 1.0, False, False),
+    Verificacao("raiz-06", "Verificação de teste da raiz 6", 1.0, False, False),
+    Verificacao("raiz-07", "Verificação de teste da raiz 7", 1.0, False, False),
+    Verificacao("raiz-08", "Verificação de teste da raiz 8", 1.0, False, False),
+    Verificacao("raiz-09", "Verificação de teste da raiz 9", 1.0, False, False),
+    Verificacao("raiz-10", "Verificação de teste da raiz 10", 1.0, False, False),
+    Verificacao(
+        "nivel-2", "Verificação de teste no nível 2", 1.0, False, False,
+        dependencias=("raiz-01",),
+    ),
+    Verificacao(
+        "nivel-3", "Verificação de teste no nível 3", 1.0, False, False,
+        dependencias=("nivel-2",),
+    ),
+    Verificacao(
+        "nivel-4", "Verificação de teste no nível 4", 1.0, False, False,
+        dependencias=("nivel-3",),
+    ),
+    Verificacao(
+        "nivel-5", "Verificação de teste no nível 5", 1.0, False, True,
+        dependencias=("nivel-4",),
+    ),
+)
+
 class Diagnostico:
     """O problema de busca: em que ordem fazer as verificações do caso.
 
@@ -166,12 +199,25 @@ class Diagnostico:
     """
 
     def __init__(self, verificacoes: tuple[Verificacao, ...]):
-        # Todas as verificações do caso.
-        self.verificacoes = verificacoes
+        # Uma verificação essencial também exige todas as suas predecessoras.
+        verificacoes_por_id = {v.id: v for v in verificacoes}
+        essenciais = {v.id for v in verificacoes if v.essencial}
+        fila = list(essenciais)
+        while fila:
+            id_filha = fila.pop()
+            for id_parente in verificacoes_por_id[id_filha].dependencias:
+                if id_parente not in essenciais:
+                    essenciais.add(id_parente)
+                    fila.append(id_parente)
+
+        # Todas as verificações do caso, com essencialidade propagada.
+        self.verificacoes = tuple(
+            replace(v, essencial=v.id in essenciais) for v in verificacoes
+        )
         # Dicionário para achar uma verificação pelo ID.
         # A chave é o ID. O valor é a verificação.
         # O sublinhado no início indica uso interno da classe.
-        self._por_id = {v.id: v for v in verificacoes}
+        self._por_id = {v.id: v for v in self.verificacoes}
         # Estado inicial: nenhuma verificação feita.
         # Também não há resultado positivo.
         self.estado_inicial: tuple[tuple[str, ...], tuple[str, ...]] = ((), ())
@@ -273,3 +319,4 @@ class Diagnostico:
 
 # Instância do problema de busca com as verificações do AMS
 AMS = Diagnostico(CASO_AMS)
+TESTE_DEPENDENCIAS = Diagnostico(CASO_TESTE_DEPENDENCIAS)

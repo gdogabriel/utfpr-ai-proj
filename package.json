@@ -10,6 +10,8 @@
     "d2:lab4:buscas": ".venv/bin/python esqueleto-lab4.py",
     "d2:lab5:heuristicas": ".venv/bin/python esqueleto-lab5.py",
     "d2:lab6:testes": "cd d2/lab6 && ../../.venv/bin/python -m pytest teste.py -q",
-    "d2:lab6:medir": "cd d2/lab6 && ../../.venv/bin/python medir.py"
+    "d2:lab6:medir": "cd d2/lab6 && ../../.venv/bin/python medir.py",
+    "d2:verificar-formulacao": ".venv/bin/python verificar-formulacao.py diagnostico.py:AMS",
+    "d2:verificar-dependencias": ".venv/bin/python verificar-formulacao.py diagnostico.py:TESTE_DEPENDENCIAS"
   }
 }
