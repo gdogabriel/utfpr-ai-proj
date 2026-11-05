@@ -9,14 +9,10 @@ Quatro famílias:
      e a ORDEM das condições importa (a primeira que casa decide);
   2. O ESTADO INTERNO — falhas contam dentro da janela e envelhecem fora
      dela; sem desfecho, o estado não muda;
-  3. O GABARITO DA RESERVA — as 30 decisões do `esqueleto.py` sobre
-     `casos-de-reserva.csv`, caso a caso, e a métrica final: 25/30. Os
-     cinco erros são de propósito: é a matéria-prima da análise escrita;
+  3. O GABARITO DOS 30 CASOS — as 30 decisões do `esqueleto.py` sobre
+     `casos-ams.csv`, caso a caso, e as métricas finais;
   4. A TROCA — o mesmo medidor rodando sobre OUTRO arquivo de casos, sem
      tocar em código: a troca do conjunto é uma linha (slide 29).
-
-Se o seu domínio é outro, as famílias 1 e 2 é que continuam valendo —
-adapte-as aos SEUS limiares. A 3 é o gabarito do conjunto de reserva.
 """
 
 from __future__ import annotations
@@ -35,107 +31,139 @@ esqueleto = importlib.util.module_from_spec(_spec)
 sys.modules["esqueleto"] = esqueleto
 _spec.loader.exec_module(esqueleto)  # type: ignore[union-attr]
 
-# O gabarito das 30 decisões sobre o conjunto de reserva, na ordem do
-# arquivo (cronológica). Erros de propósito: C07 e C08 (falha intermitente
-# que as leituras não veem), C10 (excesso de cautela da família), C11 e
-# C22 (os dois atípicos, onde parar era exagero).
 ESPERADO = {
-    "C01": "seguir_operando", "C02": "parar_para_manutencao",
-    "C03": "parar_para_manutencao", "C04": "seguir_operando",
-    "C05": "seguir_operando", "C06": "seguir_operando",
-    "C07": "seguir_operando", "C08": "seguir_operando",
-    "C09": "inspecionar_antes_de_operar", "C10": "inspecionar_antes_de_operar",
-    "C11": "parar_para_manutencao", "C12": "seguir_operando",
-    "C13": "parar_para_manutencao", "C14": "seguir_operando",
-    "C15": "parar_para_manutencao", "C16": "seguir_operando",
-    "C17": "seguir_operando", "C18": "inspecionar_antes_de_operar",
-    "C19": "inspecionar_antes_de_operar", "C20": "seguir_operando",
-    "C21": "parar_para_manutencao", "C22": "parar_para_manutencao",
-    "C23": "seguir_operando", "C24": "seguir_operando",
-    "C25": "seguir_operando", "C26": "seguir_operando",
-    "C27": "parar_para_manutencao", "C28": "parar_para_manutencao",
-    "C29": "seguir_operando", "C30": "seguir_operando",
+    "UDI-1": ("baixo", False),
+    "UDI-11": ("baixo", False),
+    "UDI-21": ("baixo", False),
+    "UDI-31": ("baixo", False),
+    "UDI-41": ("baixo", False),
+    "UDI-51": ("alto", True),
+    "UDI-52": ("baixo", False),
+    "UDI-70": ("alto", True),
+    "UDI-72": ("medio", True),
+    "UDI-73": ("medio", True),
+    "UDI-74": ("alto", True),
+    "UDI-78": ("alto", True),
+    "UDI-87": ("baixo", False),
+    "UDI-97": ("baixo", False),
+    "UDI-107": ("baixo", False),
+    "UDI-117": ("baixo", False),
+    "UDI-157": ("alto", True),
+    "UDI-161": ("alto", True),
+    "UDI-162": ("alto", True),
+    "UDI-169": ("alto", True),
+    "UDI-1088": ("alto", True),
+    "UDI-1222": ("baixo", False),
+    "UDI-1325": ("alto", True),
+    "UDI-1438": ("baixo", False),
+    "UDI-1493": ("alto", True),
+    "UDI-1997": ("medio", True),
+    "UDI-3237": ("alto", True),
+    "UDI-3761": ("alto", True),
+    "UDI-4045": ("baixo", False),
+    "UDI-4685": ("baixo", False),
 }
-ERROS_ESPERADOS = ["C07", "C08", "C10", "C11", "C22"]
+ERROS_ESPERADOS = [
+    "UDI-72",
+    "UDI-73",
+    "UDI-74",
+    "UDI-157",
+    "UDI-1438",
+    "UDI-4045",
+    "UDI-4685",
+]
 
 
 def _registro(**mudancas) -> dict:
-    base = {"data": "2026-03-02", "tipo_maquina": "TORNO",
-            "idade_meses": 60, "temperatura_c": 62.0,
-            "vibracao_mm_s": 3.0, "horas_desde_manutencao": 100.0,
-            "falhou_depois": 0}
+    base = {
+        "UDI": 1,
+        "Product ID": "M14860",
+        "Type": "M",
+        "Air temperature [K]": 298.1,
+        "Process temperature [K]": 308.6,
+        "Rotational speed [rpm]": 1551.0,
+        "Torque [Nm]": 42.8,
+        "Tool wear [min]": 100.0,
+        "Machine failure": 0,
+    }
     base.update(mudancas)
     return base
 
 
 # --- 1. as regras -----------------------------------------------------------
 
-def test_condicao_reativa_para_com_vibracao_alta():
+def test_condicao_reativa_para_com_desgaste_critico():
     estado = esqueleto.EstadoDaFrota()
-    decisao = esqueleto.decidir(_registro(vibracao_mm_s=7.5), estado)
-    assert decisao == "parar_para_manutencao"
+    decisao = esqueleto.decidir(_registro(**{"Tool wear [min]": 205.0}), estado)
+    assert decisao == ("alto", True)
 
 
-def test_condicao_reativa_para_com_temperatura_alta():
+def test_condicao_reativa_para_com_falha_dissipacao_calor():
     estado = esqueleto.EstadoDaFrota()
-    decisao = esqueleto.decidir(_registro(temperatura_c=79.0), estado)
-    assert decisao == "parar_para_manutencao"
+    decisao = esqueleto.decidir(
+        _registro(**{
+            "Air temperature [K]": 302.0,
+            "Process temperature [K]": 310.0,  # dif = 8.0 < 8.6
+            "Rotational speed [rpm]": 1350.0,  # < 1380
+        }),
+        estado,
+    )
+    assert decisao == ("alto", True)
 
 
-def test_estado_interno_inspeciona_apos_duas_falhas_da_familia():
+def test_estado_interno_bloqueia_apos_duas_falhas_da_familia_com_desgaste_fronteira():
     estado = esqueleto.EstadoDaFrota()
-    registro = _registro(data="2026-03-02", falhou_depois=1)
-    estado.registrar_desfecho(registro)          # primeira falha
-    assert esqueleto.decidir(_registro(), estado) == "seguir_operando"
-    estado.registrar_desfecho(_registro(data="2026-03-03", falhou_depois=1))
-    decisao = esqueleto.decidir(_registro(data="2026-03-04"), estado)
-    assert decisao == "inspecionar_antes_de_operar"
+    estado.registrar_desfecho(_registro(**{"Machine failure": 1}))  # 1ª falha
+    assert esqueleto.decidir(_registro(**{"Tool wear [min]": 195.0}), estado) == ("baixo", False)
+    estado.registrar_desfecho(_registro(**{"Machine failure": 1}))  # 2ª falha
+    decisao = esqueleto.decidir(_registro(**{"Tool wear [min]": 195.0}), estado)
+    assert decisao == ("medio", True)
 
 
 def test_a_ordem_das_condicoes_importa():
     estado = esqueleto.EstadoDaFrota()
-    for dia in ("2026-03-02", "2026-03-03"):
-        estado.registrar_desfecho(
-            _registro(data=dia, falhou_depois=1))
-    tudo_alto = _registro(data="2026-03-04", vibracao_mm_s=9.0,
-                          temperatura_c=85.0)
-    assert esqueleto.decidir(tudo_alto, estado) == "parar_para_manutencao", (
-        "com leitura crítica, PARA — a condição reativa vem primeiro")
+    for _ in range(2):
+        estado.registrar_desfecho(_registro(**{"Machine failure": 1}))
+    critico = _registro(**{"Tool wear [min]": 210.0})
+    assert esqueleto.decidir(critico, estado) == ("alto", True), (
+        "com leitura crítica, classifica risco alto — a condição reativa vem primeiro"
+    )
 
 
-def test_familia_diferente_nao_hera_as_falhas():
+def test_familia_diferente_nao_herda_as_falhas():
     estado = esqueleto.EstadoDaFrota()
-    estado.registrar_desfecho(
-        _registro(tipo_maquina="PRENSA", data="2026-03-02", falhou_depois=1))
-    estado.registrar_desfecho(
-        _registro(tipo_maquina="PRENSA", data="2026-03-03", falhou_depois=1))
+    estado.registrar_desfecho(_registro(**{"Type": "L", "Machine failure": 1}))
+    estado.registrar_desfecho(_registro(**{"Type": "L", "Machine failure": 1}))
     decisao = esqueleto.decidir(
-        _registro(tipo_maquina="ROBOT", data="2026-03-04"), estado)
-    assert decisao == "seguir_operando"
+        _registro(**{"Type": "H", "Tool wear [min]": 195.0}),
+        estado,
+    )
+    assert decisao == ("baixo", False)
 
 
 # --- 2. o estado interno e a janela -----------------------------------------
 
 def test_falha_envelhece_fora_da_janela():
     estado = esqueleto.EstadoDaFrota()
-    estado.registrar_desfecho(
-        _registro(data="2026-03-02", falhou_depois=1))
-    # oito dias depois, a falha já saiu da janela de 7 dias
-    decisao = esqueleto.decidir(
-        _registro(data="2026-03-10", falhou_depois=1), estado)
-    assert decisao == "seguir_operando"
+    estado.registrar_desfecho(_registro(**{"Machine failure": 1}))
+    estado.registrar_desfecho(_registro(**{"Machine failure": 1}))
+    # Avança JANELA_CASOS registros sem falha para expirar as falhas antigas
+    for _ in range(esqueleto.JANELA_CASOS):
+        estado.registrar_desfecho(_registro(**{"Machine failure": 0}))
+    decisao = esqueleto.decidir(_registro(**{"Tool wear [min]": 195.0}), estado)
+    assert decisao == ("baixo", False)
 
 
 def test_sem_desfecho_o_estado_nao_muda():
     estado = esqueleto.EstadoDaFrota()
-    estado.registrar_desfecho(_registro(data="2026-03-02", falhou_depois=0))
-    assert estado.falhas_recentes("TORNO") == 0
+    estado.registrar_desfecho(_registro(**{"Machine failure": 0}))
+    assert estado.falhas_recentes("M") == 0
 
 
-# --- 3. o gabarito da reserva ------------------------------------------------
+# --- 3. o gabarito dos 30 casos ---------------------------------------------
 
 def test_as_trinta_decisoes_batem_com_o_gabarito():
-    casos = esqueleto.carregar_casos(esqueleto.CAMINHO_DOS_CASOS)
+    casos = esqueleto.carregar_casos(_AQUI / esqueleto.CAMINHO_DOS_CASOS)
     estado = esqueleto.EstadoDaFrota()
     divergentes = []
     for registro in casos:
@@ -143,35 +171,37 @@ def test_as_trinta_decisoes_batem_com_o_gabarito():
         if decisao != ESPERADO[registro["id_caso"]]:
             divergentes.append((registro["id_caso"], decisao))
         estado.registrar_desfecho(registro)
-    assert not divergentes, (
-        f"decisões divergentes do gabarito: {divergentes}. Ou as regras do "
-        "esqueleto mudaram (aí o gabarito deste teste precisa ser regerado "
-        "e o número da análise, atualizado), ou há defeito nas regras.")
+    assert not divergentes, f"decisões divergentes do gabarito: {divergentes}"
 
 
-def test_a_metrica_final_da_reserva_e_25_de_30():
-    resultado = medir(esqueleto.CAMINHO_DOS_CASOS)
+def test_as_metricas_finais_dos_trinta_casos():
+    resultado = medir(_AQUI / esqueleto.CAMINHO_DOS_CASOS)
     assert resultado["total"] == 30
-    assert (resultado["acertos"], round(resultado["valor"], 4)) == (25, 0.8333)
-    assert [e["id_caso"] for e in resultado["erros"]] == ERROS_ESPERADOS, (
-        "os cinco erros são a matéria-prima da análise escrita — mudaram, "
-        "muda a análise")
+    assert (resultado["falhas_capturadas"], resultado["total_falhas_reais"]) == (12, 15)
+    assert round(resultado["recall"], 4) == 0.8000
+    assert (resultado["acertos"], round(resultado["valor"], 4)) == (23, 0.7667)
+    assert [e["id_caso"] for e in resultado["erros"]] == ERROS_ESPERADOS
 
 
-# --- 4. a troca do conjunto é uma linha ---------------------------------------
+# --- 4. a troca do conjunto é uma linha -------------------------------------
 
 def test_o_medidor_roda_sobre_outro_arquivo_sem_tocar_em_codigo(tmp_path):
     casos_novos = tmp_path / "meus_casos.csv"
     with casos_novos.open("w", encoding="utf-8", newline="") as arquivo:
         escritor = csv.writer(arquivo)
-        escritor.writerow(["id_caso", "data", "tipo_maquina", "idade_meses",
-                           "temperatura_c", "vibracao_mm_s",
-                           "horas_desde_manutencao", "acao_correta",
-                           "falhou_depois"])
-        escritor.writerow(["M01", "2026-04-01", "TORNO", 60, 82.0, 3.0,
-                           100.0, "parar_para_manutencao", 1])
-        escritor.writerow(["M02", "2026-04-02", "ROBOT", 40, 60.0, 2.0,
-                           120.0, "seguir_operando", 0])
+        escritor.writerow([
+            "UDI", "Product ID", "Type", "Air temperature [K]",
+            "Process temperature [K]", "Rotational speed [rpm]",
+            "Torque [Nm]", "Tool wear [min]", "Machine failure",
+            "TWF", "HDF", "PWF", "OSF", "RNF",
+        ])
+        escritor.writerow([
+            1, "M14860", "M", 298.1, 308.6, 1551, 42.8, 210, 1, 1, 0, 0, 0, 0,
+        ])
+        escritor.writerow([
+            2, "L47181", "L", 298.2, 308.7, 1408, 46.3, 10, 0, 0, 0, 0, 0, 0,
+        ])
     resultado = medir(casos_novos)
     assert resultado["total"] == 2
     assert resultado["acertos"] == 2
+    assert resultado["recall"] == 1.0
