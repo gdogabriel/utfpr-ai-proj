@@ -20,15 +20,12 @@ Como usar:
     3. rode:  python medir.py
     4. quando o baseline estiver pronto, copie as funções para
        `src/<projeto>/baseline.py` — é o caminho que a entrega final cobra.
-
-Este módulo roda de fábrica sobre o conjunto de reserva que viaja no
-pacote: medida funcionando antes da primeira adaptação.
 """
 
 from __future__ import annotations
 
 import csv
-from datetime import date as _date
+import math
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -39,86 +36,118 @@ CAMINHO_DOS_CASOS = "casos-ams.csv"
 # CAMINHO_DOS_CASOS = "casos-de-reserva.csv"
 
 # --------------------------------------------------------------------------
-# Os limiares das regras — TODO: troque pelos do SEU domínio.
-# (Os valores abaixo são os do domínio de exemplo: máquinas industriais.)
+# Os limiares das regras — Domínio: Assistente de Manutenção Segura (AMS)
+# Baseados no AI4I 2020 Predictive Maintenance Dataset (ai4i2020.csv).
 # --------------------------------------------------------------------------
-LIMITE_VIBRACAO = 7.0          # mm/s — acima disso, para
-LIMITE_TEMPERATURA = 78.0      # °C   — acima disso, para
-FALHAS_PARA_INSPECAO = 2       # falhas observadas da família → inspecionar
-JANELA_DIAS = 7                # "recentes" = dentro desta janela
+LIMITE_DIF_TEMP = 8.6              # K — abaixo disso (com baixa rotação), HDF
+LIMITE_ROTACAO_HDF = 1380          # rpm — abaixo disso (com baixa dif. temp.), HDF
+POTENCIA_MIN = 3500.0              # W — abaixo disso, falha de potência (PWF)
+POTENCIA_MAX = 9000.0              # W — acima disso, falha de potência (PWF)
+LIMITE_DESGASTE_TWF = 200          # min — a partir disso, desgaste crítico (TWF)
+LIMITE_OSF = {                     # min * Nm — acima disso, sobrecarga (OSF)
+    "L": 11000.0,
+    "M": 12000.0,
+    "H": 13000.0,
+}
+
+# Limiares do estado interno (observabilidade parcial):
+LIMITE_DESGASTE_INSPECAO = 190     # min — zona de fronteira antes de 200 min
+FALHAS_PARA_INSPECAO = 2           # falhas recentes do mesmo Type → inspecionar
+JANELA_CASOS = 5                   # janela de observações recentes na linha
 
 # --------------------------------------------------------------------------
 # Estado interno — a memória do que o agente JÁ OBSERVOU do ambiente.
 # O agente não sabe o futuro: ele acumula os desfechos que o ambiente
-# revelou até agora. E "até agora" tem política de esquecimento — decidir
-# por quanto tempo guardar é parte da decisão de estado interno (slide 24
-# do E2). Sem a janela, duas falhas antigas deixariam a família inteira em
-# inspeção para sempre. Quem apagar a segunda condição de decidir() pode
-# apagar esta classe junto.
+# revelou até agora, com política de esquecimento por janela (slide 24 do E2).
 # --------------------------------------------------------------------------
 
 
 class EstadoDaFrota:
-    """O que o agente já observou: falhas por família, dentro da janela."""
+    """O que o agente já observou: falhas por tipo de máquina, dentro da janela."""
 
-    def __init__(self, janela_dias: int = JANELA_DIAS) -> None:
-        self._janela = janela_dias
-        self._falhas: list[tuple[str, _date]] = []
-        self._ultima_data: _date | None = None
+    def __init__(self, janela_casos: int = JANELA_CASOS) -> None:
+        self._janela = janela_casos
+        self._falhas: list[tuple[str, int]] = []
+        self._passo_atual: int = 0
 
     def falhas_recentes(self, familia: str) -> int:
-        """Quantas falhas desta família o agente viu, dentro da janela."""
-        if self._ultima_data is None:
+        """Quantas falhas desta família (Type) o agente viu dentro da janela."""
+        if self._passo_atual == 0:
             return 0
-        limite = self._ultima_data.toordinal() - self._janela
+        limite = self._passo_atual - self._janela
         return sum(
-            1 for familia_vista, dia in self._falhas
-            if familia_vista == familia and dia.toordinal() >= limite)
+            1 for familia_vista, passo in self._falhas
+            if familia_vista == familia and passo > limite
+        )
 
     def registrar_desfecho(self, registro: dict) -> None:
         """O ambiente revela o desfecho do caso — a percepção do próximo
-        ciclo é maior do que a do anterior (parcialmente observável). Sem
-        desfecho observado, não há o que registrar."""
-        self._ultima_data = _date.fromisoformat(registro["data"])
-        if int(registro.get("falhou_depois", 0)) == 1:
-            self._falhas.append(
-                (registro["tipo_maquina"], self._ultima_data))
+        ciclo é maior do que a do anterior (parcialmente observável)."""
+        self._passo_atual += 1
+        falhou = int(registro.get("Machine failure", registro.get("falhou_depois", 0)))
+        familia = str(registro.get("Type", registro.get("tipo_maquina", "")))
+        if falhou == 1:
+            self._falhas.append((familia, self._passo_atual))
 
 
 # --------------------------------------------------------------------------
-# A decisão — o coração do agente, em oito linhas (slide 22)
+# A decisão — o coração do agente (slide 22)
 # --------------------------------------------------------------------------
+
+def _condicao_reativa_critica(registro: dict) -> bool:
+    """Avalia os 4 modos de falha determinísticos sobre os sensores do instante."""
+    tipo = str(registro["Type"])
+    temp_ar = float(registro["Air temperature [K]"])
+    temp_proc = float(registro["Process temperature [K]"])
+    rotacao = float(registro["Rotational speed [rpm]"])
+    torque = float(registro["Torque [Nm]"])
+    desgaste = float(registro["Tool wear [min]"])
+
+    potencia = torque * rotacao * (2 * math.pi) / 60.0
+
+    hdf = (temp_proc - temp_ar < LIMITE_DIF_TEMP) and (rotacao < LIMITE_ROTACAO_HDF)
+    pwf = (potencia < POTENCIA_MIN) or (potencia > POTENCIA_MAX)
+    twf = desgaste >= LIMITE_DESGASTE_TWF
+    osf = (desgaste * torque) > LIMITE_OSF.get(tipo, 12000.0)
+    return hdf or pwf or twf or osf
+
 
 def decidir(registro: dict, estado: EstadoDaFrota) -> str:
     """Uma rodada: percepção entra, ação sai.
 
-    TODO 1: a condição reativa — limiares sobre o REGISTRO atual.
-    TODO 2: a condição com estado interno — ou APAGUE-A, se o seu ambiente
-    é totalmente observável, e registre a escolha na análise.
+    Condição 1 (reativa): limiares físicos sobre o REGISTRO atual.
+    Condição 2 (estado interno): histórico recente de falhas do mesmo Type
+    combinado com desgaste na zona de fronteira (>= 190 min).
     A ordem importa: a primeira que casar decide.
     """
-    if registro["vibracao_mm_s"] > LIMITE_VIBRACAO or \
-            registro["temperatura_c"] > LIMITE_TEMPERATURA:
+    if _condicao_reativa_critica(registro):
         return "parar_para_manutencao"
-    if estado.falhas_recentes(registro["tipo_maquina"]) >= FALHAS_PARA_INSPECAO:
+    if (estado.falhas_recentes(str(registro["Type"])) >= FALHAS_PARA_INSPECAO
+            and float(registro["Tool wear [min]"]) >= LIMITE_DESGASTE_INSPECAO):
         return "inspecionar_antes_de_operar"
     return "seguir_operando"
 
 
 def carregar_casos(caminho: str | Path) -> list[dict]:
-    """Lê o CSV de casos rotulados, em ordem cronológica — a ordem importa,
-    porque o estado interno se acumula caso a caso. encoding utf-8-sig:
-    tolera o BOM que o Excel costuma gravar."""
+    """Lê o CSV de casos do domínio (ai4i2020) na ordem sequencial de UDI."""
     with Path(caminho).open(encoding="utf-8-sig", newline="") as arquivo:
         casos = list(csv.DictReader(arquivo))
-    casos.sort(key=lambda registro: registro["data"])
+    casos.sort(key=lambda registro: int(registro["UDI"]))
     for registro in casos:
-        registro["idade_meses"] = int(registro["idade_meses"])
-        registro["temperatura_c"] = float(registro["temperatura_c"])
-        registro["vibracao_mm_s"] = float(registro["vibracao_mm_s"])
-        registro["horas_desde_manutencao"] = float(
-            registro["horas_desde_manutencao"])
-        registro["falhou_depois"] = int(registro["falhou_depois"])
+        registro["UDI"] = int(registro["UDI"])
+        registro["id_caso"] = f"UDI-{registro['UDI']}"
+        registro["Air temperature [K]"] = float(registro["Air temperature [K]"])
+        registro["Process temperature [K]"] = float(registro["Process temperature [K]"])
+        registro["Rotational speed [rpm]"] = float(registro["Rotational speed [rpm]"])
+        registro["Torque [Nm]"] = float(registro["Torque [Nm]"])
+        registro["Tool wear [min]"] = float(registro["Tool wear [min]"])
+        registro["Machine failure"] = int(registro["Machine failure"])
+        registro["falhou_depois"] = registro["Machine failure"]
+        registro["acao_correta"] = (
+            "parar_para_manutencao"
+            if registro["Machine failure"] == 1
+            else "seguir_operando"
+        )
     return casos
 
 
