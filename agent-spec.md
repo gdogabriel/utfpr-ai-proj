@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** Assistente de Manutenção Segura
-**Autor(a):** Gabriel Duarte · **Última revisão:** 04/11/2026
+**Autor(a):** Gabriel Duarte · **Última revisão:** 05/11/2026
 
 ---
 
@@ -83,6 +83,7 @@ Os atuadores definem as informações de apoio que o agente apresenta na tela do
 - **Informar Nível de Risco e Confiança:** Apresentar a classificação do risco de falha (`baixo`, `médio` ou `alto`), a justificativa técnica e o percentual de confiança.
 - **Indicar Normas Aplicáveis:** Apontar as normas de segurança necessárias para a intervenção (`NR-10`, `NR-12`, `NR-35` ou `NENHUMA`).
 - **Recomendar Bloqueio de Segurança:** Indicar se a intervenção exige bloqueio físico e etiquetagem (`requer_bloqueio = true | false`).
+- **Escalar Ordem de Serviço:** Encaminhar a OS para revisão da supervisão/engenharia quando a verificação de integridade dos sensores (`sanity-check`) detectar leituras inválidas ou corrompidas.
 
 ### Sensors:
 
