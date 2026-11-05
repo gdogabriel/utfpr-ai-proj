@@ -52,7 +52,7 @@ LIMITE_OSF = {                     # min * Nm — acima disso, sobrecarga (OSF)
 
 # Limiares do estado interno (observabilidade parcial):
 LIMITE_DESGASTE_INSPECAO = 190     # min — zona de fronteira antes de 200 min
-FALHAS_PARA_INSPECAO = 2           # falhas recentes do mesmo Type → inspecionar
+FALHAS_PARA_INSPECAO = 2           # falhas recentes do mesmo Type → bloquear
 JANELA_CASOS = 5                   # janela de observações recentes na linha
 
 # --------------------------------------------------------------------------
@@ -112,8 +112,8 @@ def _condicao_reativa_critica(registro: dict) -> bool:
     return hdf or pwf or twf or osf
 
 
-def decidir(registro: dict, estado: EstadoDaFrota) -> str:
-    """Uma rodada: percepção entra, ação sai.
+def decidir(registro: dict, estado: EstadoDaFrota) -> tuple[str, bool]:
+    """Uma rodada: percepção entra, ação `(risco, requer_bloqueio)` sai.
 
     Condição 1 (reativa): limiares físicos sobre o REGISTRO atual.
     Condição 2 (estado interno): histórico recente de falhas do mesmo Type
@@ -121,11 +121,11 @@ def decidir(registro: dict, estado: EstadoDaFrota) -> str:
     A ordem importa: a primeira que casar decide.
     """
     if _condicao_reativa_critica(registro):
-        return "parar_para_manutencao"
+        return ("alto", True)
     if (estado.falhas_recentes(str(registro["Type"])) >= FALHAS_PARA_INSPECAO
             and float(registro["Tool wear [min]"]) >= LIMITE_DESGASTE_INSPECAO):
-        return "inspecionar_antes_de_operar"
-    return "seguir_operando"
+        return ("medio", True)
+    return ("baixo", False)
 
 
 def carregar_casos(caminho: str | Path) -> list[dict]:
@@ -144,9 +144,9 @@ def carregar_casos(caminho: str | Path) -> list[dict]:
         registro["Machine failure"] = int(registro["Machine failure"])
         registro["falhou_depois"] = registro["Machine failure"]
         registro["acao_correta"] = (
-            "parar_para_manutencao"
+            ("alto", True)
             if registro["Machine failure"] == 1
-            else "seguir_operando"
+            else ("baixo", False)
         )
     return casos
 
