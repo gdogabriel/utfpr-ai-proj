@@ -29,7 +29,7 @@ from pathlib import Path
 # Configuração — é aqui que se troca. Nada de caminho embutido no meio do
 # código: uma constante, uma linha.
 # --------------------------------------------------------------------------
-FORMULACAO = "problemas.diagnostico:MAIOR"
+FORMULACAO = "diagnostico.py:AMS"
 # Substitua pelo SEU módulo do laboratório 03, no formato "arquivo.py:NOME".
 # O exemplo aponta para o subproblema de diagnóstico do catálogo, instância
 # maior — os números dela estão no MEDICOES.md do motor (material do
