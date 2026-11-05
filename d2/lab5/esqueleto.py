@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 # A mesma constante do lab-04 — a sua formulação, uma linha para trocar.
-FORMULACAO = "problemas.diagnostico:MAIOR"
+FORMULACAO = "diagnostico.py:AMS"
 LIMITE = 32
 
 _AQUI = Path(__file__).resolve().parent
