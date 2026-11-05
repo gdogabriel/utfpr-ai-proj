@@ -23,14 +23,21 @@ from pathlib import Path
 import esqueleto
 
 
+def _intervencao(decisao: tuple[str, bool]) -> bool:
+    """Critério de intervenção do PEAS (`agent-spec.md`):
+    `(risco == "alto" OU bloqueio == Sim)`.
+    """
+    risco, requer_bloqueio = decisao
+    return risco == "alto" or requer_bloqueio is True
+
+
 def medir(caminho: str | Path, decidir=None, classe_estado=None) -> dict:
     """Roda o agente sobre os casos e devolve o resultado da medição.
 
-    O agente decide caso a caso, em ordem cronológica; depois de cada
-    decisão, o ambiente revela o desfecho e o estado interno se atualiza —
-    é o ciclo percepção → decisão → ação → observação do agente
-    baseado em modelo. O caminho vem por parâmetro (a troca do conjunto é
-    uma linha, slide 29); sem parâmetro, o configurado no esqueleto.
+    Mantém a medição global do esqueleto (`acertos` / `total`) e calcula
+    as métricas do PEAS definidas no `agent-spec.md`:
+      - Métrica primária: Taxa de captura de falhas (F = A / T)
+      - Métrica secundária: Taxa de falsos positivos (FP = B / S)
     """
     decidir = decidir or esqueleto.decidir
     classe_estado = classe_estado or esqueleto.EstadoDaFrota
@@ -38,32 +45,70 @@ def medir(caminho: str | Path, decidir=None, classe_estado=None) -> dict:
     estado = classe_estado()
     acertos = 0
     erros: list[dict] = []
+
+    total_falhas_reais = 0      # T (Machine failure == 1)
+    falhas_capturadas = 0       # A ((risco == "alto" OU bloqueio == True) E Machine failure == 1)
+    total_saudaveis = 0         # S (Machine failure == 0)
+    falsos_positivos = 0        # B ((risco == "alto" OU bloqueio == True) E Machine failure == 0)
+
     for registro in casos:
         decisao = decidir(registro, estado)
         correta = registro["acao_correta"]
-        if decisao == correta:
+        falha_real = int(registro.get("Machine failure", registro.get("falhou_depois", 0))) == 1
+        interveio = _intervencao(decisao)
+
+        if falha_real:
+            total_falhas_reais += 1
+            if interveio:
+                falhas_capturadas += 1
+        else:
+            total_saudaveis += 1
+            if interveio:
+                falsos_positivos += 1
+
+        # Um caso é considerado acerto quando a recomendação de intervenção
+        # coincide com a ocorrência real de falha (Machine failure).
+        acertou_caso = (falha_real and interveio) or (not falha_real and not interveio)
+        if acertou_caso:
             acertos += 1
         else:
-            erros.append({"id_caso": registro["id_caso"],
-                          "decidiu": decisao, "correta": correta})
+            erros.append({
+                "id_caso": registro["id_caso"],
+                "decidiu": decisao,
+                "correta": correta,
+            })
         estado.registrar_desfecho(registro)
+
     total = len(casos)
     rotulos = Counter(registro["acao_correta"] for registro in casos)
+    recall = falhas_capturadas / total_falhas_reais if total_falhas_reais else 0.0
+    taxa_fp = falsos_positivos / total_saudaveis if total_saudaveis else 0.0
+
     return {
         "caminho": str(caminho),
         "total": total,
         "acertos": acertos,
         "valor": acertos / total if total else 0.0,
+        "falhas_capturadas": falhas_capturadas,
+        "total_falhas_reais": total_falhas_reais,
+        "recall": recall,
+        "falsos_positivos": falsos_positivos,
+        "total_saudaveis": total_saudaveis,
+        "taxa_fp": taxa_fp,
         "distribuicao": dict(rotulos),
         "erros": erros,
     }
 
 
 def imprimir(resultado: dict, nome_da_metrica: str) -> None:
-    """As três informações do slide 28, e a lista de onde erra (slide 30)."""
-    print(f"Métrica primária: {nome_da_metrica}")
-    print(f"Valor: {resultado['acertos']}/{resultado['total']} = "
-          f"{round(resultado['valor'], 4)}")
+    """As três informações do slide 28, as métricas do PEAS e a lista de onde erra (slide 30)."""
+    print(f"Métrica primária (PEAS): {nome_da_metrica}")
+    print(f"Valor (F = A / T): {resultado['falhas_capturadas']}/{resultado['total_falhas_reais']} = "
+          f"{round(resultado['recall'], 4)} ({resultado['recall']:.2%})")
+    print(f"Métrica secundária (FP = B / S): {resultado['falsos_positivos']}/{resultado['total_saudaveis']} = "
+          f"{round(resultado['taxa_fp'], 4)} ({resultado['taxa_fp']:.2%})")
+    print(f"Acerto global (modelo original): {resultado['acertos']}/{resultado['total']} = "
+          f"{round(resultado['valor'], 4)} ({resultado['valor']:.2%})")
     print(f"Conjunto: {resultado['caminho']} — {resultado['total']} casos "
           f"rotulados {resultado['distribuicao']}")
     if resultado["erros"]:
@@ -78,8 +123,8 @@ def imprimir(resultado: dict, nome_da_metrica: str) -> None:
 
 def medir_e_imprimir(caminho: str | Path, decidir, classe_estado) -> None:
     resultado = medir(caminho, decidir, classe_estado)
-    imprimir(resultado, "acerto da decisão "
-                        "(casos com decisão igual à rotulada, sobre o total)")
+    imprimir(resultado, "Taxa de captura de falhas / Recall "
+                        "(F = A / T: (risco == 'alto' OU bloqueio == True) sobre o total de falhas reais)")
 
 
 if __name__ == "__main__":
