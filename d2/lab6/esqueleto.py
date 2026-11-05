@@ -34,9 +34,9 @@ from pathlib import Path
 # --------------------------------------------------------------------------
 # Configuração — a troca do dataset é UMA LINHA aqui (slide 29).
 # --------------------------------------------------------------------------
-CAMINHO_DOS_CASOS = "casos-de-reserva.csv"
-# Troque pelo SEU conjunto quando estiver pronto:
-# CAMINHO_DOS_CASOS = "dados/meus_casos.csv"
+CAMINHO_DOS_CASOS = "casos-ams.csv"
+# Conjunto de reserva original do pacote:
+# CAMINHO_DOS_CASOS = "casos-de-reserva.csv"
 
 # --------------------------------------------------------------------------
 # Os limiares das regras — TODO: troque pelos do SEU domínio.
