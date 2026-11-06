@@ -14,6 +14,8 @@
     "d2:lab6:medir": "cd d2/lab6 && ../../.venv/bin/python medir.py",
     "d2:verificar-formulacao": ".venv/bin/python verificar-formulacao.py diagnostico.py:AMS",
     "d2:verificar-dependencias": ".venv/bin/python verificar-formulacao.py diagnostico.py:TESTE_DEPENDENCIAS",
-    "baseline": ".venv/bin/python src/ams/baseline.py"
+    "d2:baseline": ".venv/bin/python src/ams/baseline.py",
+    "d2:test:baseline": ".venv/bin/python -m pytest tests/test_baseline.py -q",
+    "d2:lab8:conferir": ".venv/bin/python d2/lab8/conferir-entrega.py ."
   }
 }
