@@ -156,7 +156,9 @@ Perguntas que guiam o preenchimento:
 1. **A Observabilidade Parcial elimina o Tipo 1 (Reativo simples).** Os sensores medem variáveis físicas do instante, mas sofrem ruídos de medição e não capturam desgastes internos ocultos da máquina.
 2. **O Tipo 2 (Baseado em modelo) é insuficiente pois controla apenas o estado interno dos passos já executados.** Saber quais verificações já rodaram (e seus resultados) evita repetir etapas na OS, mas o Tipo 2 não avalia qual sequência de ações chega mais rápido ao laudo final.
 3. **O ambiente Conhecido, Contínuo (discretizado) e Dinâmico exige o Tipo 3 (Baseado em objetivos).** O agente discretiza a telemetria em verificações conhecidas e usa busca para atingir o objetivo (concluir as verificações essenciais) no menor tempo, evitando respostas atrasadas.
-4. **O objetivo binário dispensa o Tipo 4 (Baseado em utilidade).** Como o teste de objetivo é binário (satisfaz ou não satisfaz) e limiares fixos já equilibram as métricas $F$ e $FP$, o Tipo 3 é o mais simples que resolve.
+4. **Na fatia de ordenação das verificações, o objetivo binário dispensa o Tipo 4 (Baseado em utilidade).** Como o teste de objetivo da busca (Seção 7) é binário (concluir todas as verificações essenciais) e o custo de passo já mede o tempo em milissegundos, o Tipo 3 é o mais simples que resolve essa etapa, enquanto os compromissos operacionais de qualidade, custo, latência e risco são governados pelas restrições da Seção 5.
+
+**O que mudou na revisão e por quê:** ajustado o item 4 da justificativa para explicitar a harmonia entre o Tipo 3 (usado na busca da Seção 7) e os termos de utilidade/restrições operacionais declarados na Seção 5.
 
 ---
 
