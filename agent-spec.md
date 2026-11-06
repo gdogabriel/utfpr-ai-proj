@@ -250,6 +250,8 @@ modelo da tabela e dois exemplos preenchidos.
 
 **O que o agente JAMAIS executa sozinho:** emitir parecer de risco quando o `sanity-check` reprovar a integridade dos sensores (leituras fisicamente impossíveis ou corrompidas) ou atuar diretamente sobre a máquina na planta (desligar, travar ou religar equipamento).
 
+**O que mudou na revisão e por quê:** as Seções 4, 5 e 6 foram consolidadas na Atividade Orientada com os números reais medidos pelo `baseline.py` sobre os 30 casos (`F = 80,00%`, `FP = 26,67%`), limites de latência e custo agnósticos de tecnologia e o catálogo de 6 ações alinhado ao escopo de emissão autônoma do relatório com trava no `sanity-check`.
+
 ---
 
 ## 7. Formulação por busca
