@@ -172,9 +172,16 @@ Perguntas que guiam o preenchimento:
 operacional completa — primária, secundárias, conjunto e limiar — é item da
 Atividade Orientada.
 
-[métrica primária e duas secundárias, cada uma com: como se
-calcula, sobre qual conjunto, qual o limiar de sucesso e o
-valor de hoje]
+- **Primária — Taxa de captura de falhas (`Recall`, $F = A / T$):**
+  - **Como se calcula:** divide-se o número de casos com falha real em que o agente recomendou intervenção ($A$, isto é, `(risco == "alto" OU requer_bloqueio == true) E Machine failure == 1`) pelo total de casos com falha real ($T$, `Machine failure == 1`).
+  - **Conjunto de casos:** 30 casos rotulados do domínio (`d2/lab6/casos-ams.csv`, extraídos do `ai4i2020.csv` com 15 falhas reais e 15 máquinas saudáveis, incluindo casos fáceis, difíceis de fronteira e 3 atípicos) e base completa (`data/raw/ai4i2020.csv`, 10.000 casos).
+  - **Limiar de sucesso e valor de hoje:** meta acima de **85%** no conjunto de 30 casos (e $\ge 97{,}35\%$ na base completa). **Valor de hoje (linha de base em `src/ams/baseline.py`):** **80,00%** (`12/15` falhas capturadas nos 30 casos; `97,35%` ou `330/339` no reativo simples sobre a base completa).
+- **Secundária 1 — Taxa de falsos positivos ($FP = B / S$):**
+  - **Como se calcula:** divide-se o número de máquinas saudáveis em que o agente recomendou intervenção indevida ($B$, `(risco == "alto" OU requer_bloqueio == true) E Machine failure == 0`) pelo total de máquinas saudáveis ($S$, `Machine failure == 0`). Impede que a métrica primária seja inflada bloqueando todas as máquinas da planta.
+  - **Limiar de sucesso e valor de hoje:** meta $\le 15\%$ no conjunto de 30 casos (e $\le 7{,}02\%$ na base completa). **Valor de hoje (`baseline.py`):** **26,67%** (`4/15` nos 30 casos, concentrados na fronteira de desgaste $\ge 190\text{ min}$; `7,02%` na base completa).
+- **Secundária 2 — Latência de emissão do parecer:**
+  - **Como se calcula:** tempo decorrido (em segundos) entre o recebimento da Ordem de Serviço e a entrega do parecer validado ao técnico. Impede que um parecer lento chegue quando a telemetria da máquina já mudou.
+  - **Limiar de sucesso e valor de hoje:** meta abaixo de **5 segundos** por OS (teto máximo tolerado pela operação: `30 s`). **Valor de hoje:** `< 0,01 s` na linha de base por regras (`26,0 ms` na busca de verificações).
 
 ---
 
