@@ -52,8 +52,8 @@ Mede a capacidade do agente de identificar e recomendar intervenção (bloqueio)
   - **F:** Taxa de captura de falhas (recall).
   - **A:** Número de casos que identificou risco alto ou recomendou intervenção e teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 1`.
   - **T:** Número total de casos com falha real, isto é, `Machine failure == 1`.
-- **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
-- **Limiar de sucesso:** F >= 97.35% de captura de falhas (referência obtida pelo [agente reativo simples](data/performance-agente-reativo-simples.md) na base completa de 10.000 casos).
+- **Conjunto de casos:** 30 casos rotulados do domínio (`d2/lab6/casos-ams.csv`) e o dataset AI4I 2020 completo (`data/raw/ai4i2020.csv`, 10.000 casos).
+- **Limiar de sucesso:** F >= 85% no conjunto de 30 casos (`80,00%` na linha de base `src/ams/baseline.py`) e F >= 97,35% na base completa de 10.000 casos (referência do [agente reativo simples](data/performance-agente-reativo-simples.md)).
 
 #### Métrica Secundária: Taxa de Falsos Positivos
 
@@ -63,8 +63,8 @@ Mede o impacto do agente na produção, evitando paradas e bloqueios indevidos e
   - **FP:** Taxa de falsos positivos.
   - **B:** Número de casos que identificou risco alto ou recomendou intervenção e não teve falha, isto é, `( risco == "alto" OU bloqueio == Sim ) E Machine failure == 0`.
   - **S:** Número total de casos sem falha, isto é, `Machine failure == 0`.
-- **Conjunto de casos:** o dataset AI4I 2020 (`ai4i2020.csv`).
-- **Limiar de sucesso:** FP <= 7.02% (referência obtida pelo [agente reativo simples](data/performance-agente-reativo-simples.md) na base completa de 10.000 casos).
+- **Conjunto de casos:** 30 casos rotulados do domínio (`d2/lab6/casos-ams.csv`) e o dataset AI4I 2020 completo (`data/raw/ai4i2020.csv`, 10.000 casos).
+- **Limiar de sucesso:** FP <= 15% no conjunto de 30 casos (`26,67%` na linha de base `src/ams/baseline.py`) e FP <= 7,02% na base completa de 10.000 casos (referência do [agente reativo simples](data/performance-agente-reativo-simples.md)).
 
 ### Environment:
 
@@ -98,6 +98,8 @@ Os sensores definem os canais de entrada percebidos pelo agente a cada chamada:
   - Tempo de desgaste da ferramenta (`Tool wear [min]`).
 
 > **Nota de Restrição de Percepção:** O indicador de falha real (`Machine failure`) e os rótulos de modos de falha **não são visíveis** para o agente.
+
+**O que mudou na revisão e por quê:** foi incluído o conjunto rotulado de 30 casos (`d2/lab6/casos-ams.csv`) com os valores medidos no `baseline.py` ao lado da base completa, e adicionado nos **Actuators** o escalonamento da OS quando o `sanity-check` reprovar a integridade dos sensores, alinhando o PEAS às Seções 4, 6 e 7.
 
 ---
 
