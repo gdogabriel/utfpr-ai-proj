@@ -126,11 +126,13 @@ Perguntas que guiam o preenchimento (uma por dimensão):
 |----------|---------------------|---------------------------|
 | Observabilidade | Parcial | Os sensores medem variáveis físicas do instante, mas não capturam ruídos de medição, histórico de manutenção nem desgastes internos ocultos da máquina. |
 | Número de agentes | Único | Considerando o escopo de deliberar sobre a OS, o agente processa cada ordem de serviço de forma isolada e autônoma antes de entregar a recomendação, sem interação com outros agentes. |
-| Determinismo | Estocástico | A mesma leitura de sensores pode resultar em falha ou não no mundo físico, e as chamadas ao modelo de linguagem possuem resposta probabilística. |
-| Episódico ou sequencial | Episódico | A avaliação de uma ordem de serviço é independente e não altera o estado nem o resultado das solicitações seguintes. |
+| Determinismo | Estocástico | A mesma leitura de sensores na fronteira de desgaste pode resultar em quebra ou operação normal no mundo físico (incluindo falhas aleatórias `RNF`), e as chamadas ao modelo de linguagem possuem resposta probabilística. |
+| Episódico ou sequencial | Episódico (na atuação) / Sequencial (no diagnóstico) | A emissão do relatório não altera fisicamente o estado da próxima máquina, mas o agente acumula o histórico recente de falhas da família (`EstadoDaFrota`) e encadeia verificações dependentes dentro da OS. |
 | Estático ou dinâmico | Dinâmico | As variáveis telemétricas da máquina continuam mudando na fábrica durante a deliberação, tornando inválidas as respostas atrasadas. |
 | Discreto ou contínuo | Contínuo | As medições físicas de telemetria variam em escalas numéricas contínuas, exigindo a discretização dos valores para a tomada de decisão. |
 | Conhecido ou desconhecido | Conhecido | As regras de decisão e os critérios de risco são estabelecidos previamente a partir do histórico de dados e das normas de segurança (NRs). |
+
+**O que mudou na revisão e por quê:** detalhada a justificativa de **Determinismo** (unindo a estocasticidade física das falhas de fronteira/`RNF` à resposta probabilística do modelo de linguagem) e a dimensão **Episódico ou sequencial** (para refletir tanto o acúmulo de falhas recentes por família no `baseline.py` quanto a sequência de verificações na busca).
 
 ---
 
