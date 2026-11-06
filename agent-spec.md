@@ -199,9 +199,17 @@ Perguntas que guiam o preenchimento:
 
 **Quando se preenche:** na Atividade Orientada.
 
-[latência aceitável, custo aceitável, o que o agente jamais
-pode fazer sozinho, e a troca qualidade × custo que você
-aceita — com um exemplo numérico]
+- **Latência aceitável:** até **5 segundos** na mediana e teto máximo de **30 segundos** por Ordem de Serviço. Acima disso em ambiente fabril dinâmico, a leitura telemétrica perde validade e atrasa o técnico em campo.
+- **Custo aceitável:** até **R\$ 0,01** por Ordem de Serviço avaliada (contabilizando chamadas externas ou custo amortizado de processamento local), com teto máximo de **3 rodadas/tentativas** por OS para evitar que um caso patológico consuma o orçamento ou trave a fila.
+- **O que o agente jamais pode fazer sozinho:** emitir parecer de risco quando o `sanity-check` reprovar a integridade dos sensores (leituras fisicamente impossíveis ou corrompidas — deve abortar o laudo e escalar a OS) e atuar diretamente sobre a máquina na planta (desligar, aplicar bloqueio físico LOTO ou religar equipamento, ações exclusivas do técnico humano).
+- **Troca qualidade × custo aceita:** aceita-se perder 1 caso de fronteira no conjunto de 30 casos (caindo de 27/30 para 26/30 acertos) ao optar por um processamento mais enxuto e rápido (menos rodadas de deliberação ou modelo compacto de baixa latência) para reduzir pela metade o custo e o tempo de resposta — exemplo: resolver 26 de 30 OS a R\$ 0,003 e `2 s` cada vale mais para a fábrica do que resolver 27 de 30 a R\$ 0,01 e `12 s`.
+
+| Termo da utilidade | O que mede no AMS | Como entra |
+| :--- | :--- | :--- |
+| **Qualidade** | Taxa de captura de falhas ($F = A / T$) | Soma, com peso alto |
+| **Custo** | Reais e recurso computacional gastos por OS (teto de 3 tentativas) | Subtrai, com peso moderado |
+| **Latência** | Segundos até entregar o relatório ao técnico (limite de `30 s`) | Subtrai, com peso moderado |
+| **Risco** | Emitir laudo com sensor corrompido ou omitir bloqueio/NR em falha real | Subtrai, com peso máximo (trava determinística) |
 
 ---
 
