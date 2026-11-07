@@ -25,6 +25,11 @@
     "d3:lab2:taxa-1.5": ".venv/bin/python d3/lab2-descida-de-gradiente/esqueleto.py --taxa 1.5",
     "d3:lab2:testes": ".venv/bin/python -m pytest d3/lab2-descida-de-gradiente/teste.py -q",
     "d3:lab3:medidas": "cd d3/lab3-estatistica-descritiva && ../../.venv/bin/python medidas.py ../../data/raw/ai4i2020.csv",
-    "d3:lab3:testes": "cd d3/lab3-estatistica-descritiva && ../../.venv/bin/python teste.py"
+    "d3:lab3:testes": "cd d3/lab3-estatistica-descritiva && ../../.venv/bin/python teste.py",
+    "d3:lab4:mapa": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao",
+    "d3:lab4:sem-normalizar": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --sem-normalizar",
+    "d3:lab4:pares": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --pares 35,36 60,77 4,9",
+    "d3:lab4:novo-105": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --novo 105",
+    "d3:lab4:testes": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python -m pytest teste.py -q"
   }
 }
