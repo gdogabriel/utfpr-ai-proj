@@ -9,6 +9,10 @@ Como usar:
     2. rode:  python esqueleto.py
     3. troque a linha NORMALIZAR para True e rode de novo — a comparação
        "com e sem normalizar" (slide 18) é ESTA linha, e não código novo;
+       3.1. alternativa via linha de comando (CLI):
+            sem normalizar:  python esqueleto.py
+            com normalizar:  python esqueleto.py --normalizar
+            (ou explícito:  python esqueleto.py --normalizar=true / --normalizar=false)
     4. escolha DOIS pares que surpreenderam e anote-os em
        `pares-surpreendentes.md` — eles voltam na D7 (slide 19);
     5. quando estiver pronto:  python -m pytest teste.py -q
@@ -19,6 +23,7 @@ não estiver no pacote, use a reserva: mude a linha CONJUNTO para
 Nenhuma rede é chamada: os vetores já vêm calculados (ver FONTE.md).
 """
 
+import argparse
 from itertools import combinations
 from pathlib import Path
 
@@ -26,7 +31,7 @@ import numpy as np
 
 # --- configuração (são estas linhas, e não código novo) ----------------------
 CONJUNTO = "dados/manutencao"  # a reserva do pacote: "dados/generico"
-NORMALIZAR = False             # a comparação com/sem normalização é AQUI (slide 13)
+NORMALIZAR = False             # a comparação com/sem normalização é AQUI (slide 13). Padrão: False. Pode ser alterado via CLI (--normalizar).
 QUANTOS = 10                   # quantos pares imprimir em cada extremo
 
 
@@ -102,6 +107,27 @@ def resumo(texto: str, n: int = 44) -> str:
 
 
 if __name__ == "__main__":
+    def _str2bool(v):
+        if isinstance(v, bool):
+            return v
+        if str(v).lower() in ("yes", "true", "t", "y", "1", "s", "sim"):
+            return True
+        elif str(v).lower() in ("no", "false", "f", "n", "0", "nao", "não"):
+            return False
+        raise argparse.ArgumentTypeError("Booleano esperado: true ou false.")
+
+    parser = argparse.ArgumentParser(description="Laboratório 01 — os vetores do meu domínio.")
+    parser.add_argument(
+        "--normalizar",
+        nargs="?",
+        const=True,
+        default=False,
+        type=_str2bool,
+        help="Normalizar vetores para comprimento 1 (padrão: False). Aceita --normalizar, --normalizar=true ou --normalizar=false.",
+    )
+    args = parser.parse_args()
+    NORMALIZAR = args.normalizar
+
     frases, matriz = carregar(CONJUNTO)
     prontos = preparar(matriz)
     pares = pares_ordenados(prontos)
