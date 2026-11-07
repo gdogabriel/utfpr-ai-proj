@@ -74,12 +74,13 @@ def preparar(matriz: np.ndarray) -> np.ndarray:
 # TAREFA 1 — a similaridade de cosseno (slide 16): o produto escalar dividido
 # pelo produto das duas normas. Duas linhas com np.dot e np.linalg.norm.
 def similaridade_cosseno(a, b):
-    ...
+    normas = np.linalg.norm(a) * np.linalg.norm(b)
+    return np.dot(a, b) / normas
 
 
 # TAREFA 2 — a distância euclidiana (slide 17): a norma da diferença. Uma linha.
 def distancia_euclidiana(a, b):
-    ...
+    return np.linalg.norm(a - b)
 
 
 # TAREFA 3 — a ordenação do slide 18: para TODO par de índices (i, j) com
@@ -87,7 +88,12 @@ def distancia_euclidiana(a, b):
 # [((i, j), valor), ...] ordenada da similaridade MAIS ALTA para a MAIS BAIXA.
 # (o módulo `itertools` já está importado lá em cima)
 def pares_ordenados(matriz):
-    ...
+    pares = [
+        ((i, j), similaridade_cosseno(matriz[i], matriz[j]))
+        for i, j in combinations(range(len(matriz)), 2)
+    ]
+    pares.sort(key=lambda item: item[1], reverse=True)
+    return pares
 # =============================================================================
 
 
