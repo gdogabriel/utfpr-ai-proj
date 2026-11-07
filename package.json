@@ -19,6 +19,10 @@
     "d2:lab8:conferir": ".venv/bin/python conferir-entrega.py .",
     "d3:lab1:sem-normalizar": ".venv/bin/python d3/lab1-vetores-do-meu-dominio/esqueleto.py --normalizar=false",
     "d3:lab1:com-normalizar": ".venv/bin/python d3/lab1-vetores-do-meu-dominio/esqueleto.py --normalizar=true",
-    "d3:lab1:testes": ".venv/bin/python -m pytest d3/lab1-vetores-do-meu-dominio/teste.py -q"
+    "d3:lab1:testes": ".venv/bin/python -m pytest d3/lab1-vetores-do-meu-dominio/teste.py -q",
+    "d3:lab2:taxa-0.1": ".venv/bin/python d3/lab2-descida-de-gradiente/esqueleto.py",
+    "d3:lab2:taxa-0.001": ".venv/bin/python d3/lab2-descida-de-gradiente/esqueleto.py --taxa 0.001",
+    "d3:lab2:taxa-1.5": ".venv/bin/python d3/lab2-descida-de-gradiente/esqueleto.py --taxa 1.5",
+    "d3:lab2:testes": ".venv/bin/python -m pytest d3/lab2-descida-de-gradiente/teste.py -q"
   }
 }
