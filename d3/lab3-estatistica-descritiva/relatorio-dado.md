@@ -455,7 +455,7 @@ confira com `python teste.py`.
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 418 valores extremos. Essas leituras representam regimes reais de sobrevelocidade nas máquinas de corte e usinagem e participam da detecção de falha de potência (PWF). Remover esses registros descartaria eventos reais que fazem parte do fenômeno estudado.
 
 ### Extremos de `Torque [Nm]` — 69 valor(es), limites [12.8000; 67.2000]
 
@@ -534,7 +534,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 69 valores extremos. Torques abaixo de 12,8 Nm e acima de 67,2 Nm correspondem a regimes reais fora da faixa segura de potência (PWF) e a sobrecarga mecânica (OSF). Como o valor extremo faz parte do fenômeno de falha, o agente precisa manter esses casos.
 
 ### Extremos de `Machine failure` — 339 valor(es), limites [0.0000; 0.0000]
 
@@ -883,7 +883,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 339 valores extremos. Machine failure é a variável alvo binária do problema, com taxa de base de 3,39% (evento raro). Como Q1 = Q3 = 0 (AIQ = 0), a regra da interquartil marca todo valor 1 como extremo, e remover esses registros apagaria as próprias falhas.
 
 ### Extremos de `TWF` — 46 valor(es), limites [0.0000; 0.0000]
 
@@ -939,7 +939,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 46 valores extremos. A variável TWF indica a falha por desgaste de ferramenta (taxa de base de 0,46%). Como Q1 = Q3 = 0, a regra da interquartil marca o valor 1 como extremo, mas ele representa uma falha real do domínio.
 
 ### Extremos de `HDF` — 115 valor(es), limites [0.0000; 0.0000]
 
@@ -1064,7 +1064,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 115 valores extremos. A variável HDF indica a falha real por dissipação de calor (taxa de base de 1,15%). Como Q1 = Q3 = 0, a regra da interquartil marca todo valor 1 como extremo, e manter esses casos preserva o fenômeno térmico no conjunto de dados.
 
 ### Extremos de `PWF` — 95 valor(es), limites [0.0000; 0.0000]
 
@@ -1169,7 +1169,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 95 valores extremos. A variável PWF indica falha de potência elétrica ou mecânica fora da faixa segura (taxa de base de 0,95%). Como Q1 = Q3 = 0, a regra da interquartil marca todo valor 1 como extremo, mas esses registros representam falhas reais.
 
 ### Extremos de `OSF` — 98 valor(es), limites [0.0000; 0.0000]
 
@@ -1277,7 +1277,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 98 valores extremos. A variável OSF indica sobrecarga mecânica causada pelo produto excessivo de desgaste e torque (taxa de base de 0,98%). Como Q1 = Q3 = 0, a regra da interquartil marca o valor 1 como extremo, e manter esses registros preserva as ocorrências reais de falha.
 
 ### Extremos de `RNF` — 19 valor(es), limites [0.0000; 0.0000]
 
@@ -1306,7 +1306,7 @@ R:
 Decisão sobre ESTES extremos — manter ou remover, caso a caso,
 com o motivo (slide 25: quem remove sem dizer, mente por omissão):
 
-R:
+R: Manter todos os 19 valores extremos. A variável RNF indica falhas aleatórias não explicadas pelos sensores nominais (taxa de base de 0,19%). Como Q1 = Q3 = 0, a regra da interquartil marca o valor 1 como extremo, mas os casos pertencem ao histórico real do conjunto de dados.
 
 
 ## Faltantes (os três mecanismos do slide 26)
@@ -1317,23 +1317,23 @@ Nenhuma variável tem valores faltantes.
 
 **1. Média e mediana se separam em alguma variável? Em qual?**
 
-R:
+R: Sim. A maior separação ocorre em `Rotational speed [rpm]`, com média de 1538,78 rpm e mediana de 1503,00 rpm (diferença de +35,78 rpm). Essa distância indica distribuição assimétrica com cauda longa à direita puxada pelas sobrevelocidades (máximo de 2886 rpm). Nas variáveis binárias de evento raro, como `Machine failure`, a média é 0,0339 e a mediana é 0,0000 porque a taxa de base das falhas é de 3,39%.
 
 **2. Quantos extremos foram marcados, e quantos você decidiu manter?**
 
-R:
+R: A regra da interquartil marcou 1.199 valores extremos em 8 variáveis (418 em `Rotational speed [rpm]`, 69 em `Torque [Nm]` e 712 nas 6 variáveis binárias de falha). Mantive todos os 1.199 valores extremos (100%). Todos representam regimes físicos reais ou falhas que o agente deve detectar.
 
 **3. Algum faltante parece do terceiro mecanismo?**
 
-R:
+R: Não, porque o conjunto de dados possui 0 células faltantes nas 14 variáveis (10.000 linhas completas). Em operação industrial real, esperaríamos faltantes do terceiro mecanismo (perdido por causa do próprio valor), como um sensor que para de registrar quando satura em falha grave. A ausência total de faltantes indica coleta contínua ou pré-tratamento anterior do conjunto de dados.
 
 **4. O que a análise da D1 não tinha visto?**
 
-R:
+R: A análise da D1 não tinha identificado a cauda longa à direita em `Rotational speed [rpm]` (418 valores extremos acima de 1895,5 rpm puxando a média 35,78 rpm acima da mediana). A D1 também não tinha avaliado o efeito da regra da interquartil sobre variáveis binárias de evento raro, que marca todas as 339 falhas de `Machine failure` como valores extremos porque AIQ = 0. A D3 mostrou com números que valor extremo não significa erro de medição descartável.
 
 ## Comparação com a análise exploratória da D1
 
 O que mudou de lá para cá — o que a análise de lá não tinha visto,
 e o que estas decisões escritas mudam no conjunto que a D5 vai usar:
 
-R:
+R: A análise evoluiu de uma leitura básica de médias e percentuais (3,39% de falhas na D1) para uma caracterização com mediana, quartis, amplitude interquartil e identificação de cauda longa em `Rotational speed [rpm]` (até 2886 rpm) e `Torque [Nm]` (até 76,6 Nm). Para a D5, a decisão escrita de manter os 1.199 valores extremos preserva o fenômeno real de falha no conjunto de dados. Como esses extremos são legítimos, a D5 deve escolher métricas e funções de perda resistentes a extremos (como erro absoluto ou perda de Huber) em vez de descartar dados.
