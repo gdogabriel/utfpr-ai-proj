@@ -8,6 +8,7 @@
     "d2:lab3:testes": "cd d2/lab3 && ../../.venv/bin/python -m pytest teste.py -q",
     "d2:lab4:verificar-formulacao": "cd d2/lab4 && ../../.venv/bin/python ../../verificar-formulacao.py diagnostico.py:AMS",
     "d2:lab4:buscas": "cd d2/lab4 && ../../.venv/bin/python esqueleto.py",
+    "d2:lab4:testes": "cd d2/lab4 && ../../.venv/bin/python -m pytest teste.py -q",
     "d2:lab5:busca-informada": "cd d2/lab5 && ../../.venv/bin/python esqueleto.py",
     "d2:lab5:testes": "cd d2/lab5 && ../../.venv/bin/python -m pytest teste.py -q",
     "d2:lab6:testes": "cd d2/lab6 && ../../.venv/bin/python -m pytest teste.py -q",
