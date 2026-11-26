@@ -31,6 +31,10 @@
     "d3:lab4:sem-normalizar": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --sem-normalizar",
     "d3:lab4:pares": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --pares 14,164 35,36 1,62",
     "d3:lab4:novo-105": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python esqueleto.py manutencao --novo 105",
-    "d3:lab4:testes": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python -m pytest teste.py -q"
+    "d3:lab4:testes": "cd d3/lab4-mapa-do-espaco && ../../.venv/bin/python -m pytest teste.py -q",
+    "d3:ao1:casos-60": ".venv/bin/python d3/ao1/casos-ams-60.py",
+    "d3:ao1:variante-b": ".venv/bin/python src/ams/variante_b.py",
+    "d3:ao1:testes": ".venv/bin/python -m pytest tests/test_variante_b.py -q",
+    "d3:ao1:notebook": "MPLCONFIGDIR=/tmp/matplotlib .venv/bin/python -m jupyter nbconvert --to notebook --execute --inplace notebooks/03-estatistica.ipynb"
   }
 }
